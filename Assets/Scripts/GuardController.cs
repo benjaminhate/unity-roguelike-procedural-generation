@@ -7,9 +7,8 @@ public enum State{
 	Chase
 }
 
-public class GuardController : MonoBehaviour {
+public class GuardController : Controller {
 
-	public float speed;
 	public Waypoint[] waypoints;
 
 	private FieldOfView fov;
@@ -22,6 +21,7 @@ public class GuardController : MonoBehaviour {
 	void Start () {
 		fov = GetComponent<FieldOfView> ();
 		state = State.Patrol;
+		UpdateController ();
 	}
 	
 	// Update is called once per frame
@@ -64,7 +64,7 @@ public class GuardController : MonoBehaviour {
 		Vector3 targetPos = target.position;
 
 		Vector3 dir = (targetPos - currentPos).normalized;
-		transform.position += dir * speed * Time.deltaTime;
+		transform.position += dir * characteristics.speed * Time.deltaTime;
 		if (dir != Vector3.zero) {
 			float angle = Mathf.Atan2 (dir.x, dir.y) * Mathf.Rad2Deg;
 			transform.rotation = Quaternion.AngleAxis(angle,Vector3.back);
