@@ -468,8 +468,8 @@ GameObject:
   - component: {fileID: 1271243505}
   - component: {fileID: 1271243504}
   - component: {fileID: 1271243508}
-  - component: {fileID: 1271243507}
   - component: {fileID: 1271243506}
+  - component: {fileID: 1271243507}
   m_Layer: 0
   m_Name: Target
   m_TagString: Player
@@ -677,10 +677,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1495022662}
   - component: {fileID: 1495022661}
-  - component: {fileID: 1495022663}
-  - component: {fileID: 1495022665}
   - component: {fileID: 1495022666}
   - component: {fileID: 1495022664}
+  - component: {fileID: 1495022663}
+  - component: {fileID: 1495022665}
   - component: {fileID: 1495022667}
   m_Layer: 0
   m_Name: Guard

@@ -64,6 +64,7 @@ public class GuardController : Controller {
 		Vector3 targetPos = target.position;
 
 		Vector3 dir = (targetPos - currentPos).normalized;
+		Debug.Log (dir);
 		transform.position += dir * characteristics.speed * Time.deltaTime;
 		if (dir != Vector3.zero) {
 			float angle = Mathf.Atan2 (dir.x, dir.y) * Mathf.Rad2Deg;
@@ -74,7 +75,8 @@ public class GuardController : Controller {
 	void MoveToWaypoint(Waypoint waypoint){
 		Vector3 currentPos = transform.position;
 		Vector3 waypointPos = waypoint.transform.position;
-
+		Debug.Log (waypointPos);
+		Debug.Log (Vector3.Distance (currentPos, waypointPos));
 		if (Vector3.Distance (currentPos, waypointPos) < .1f) {
 			NextWaypoint ();
 		} else {
