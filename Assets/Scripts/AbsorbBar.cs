@@ -11,26 +11,51 @@ public class AbsorbBar : MonoBehaviour {
 	public RectTransform bar;
 	public Transform targetFollow;
 
+	private float amount;
+	public float maxAmout;
+
 	void Start(){
 		SetBarData (bar, targetCanvas);
 	}
 
+	// Initialise the bar's values
 	public void SetBarData(RectTransform barRect,RectTransform barPanel){
 		targetCanvas = barPanel;
-		targetFollow = GetComponent<Transform> ();
+		targetFollow = transform;
 		bar = barRect;
 		RepositionBar ();
 		bar.gameObject.SetActive (true);
 	}
 
-	public void OnDataChanged(float fillAmount){
-		bar.GetComponent<Image> ().fillAmount = fillAmount;
+	// Fill the bar with the percentage of amount
+	public void OnDataChanged(){
+		bar.GetComponent<Image> ().fillAmount = amount / maxAmout;
+	}
+
+	public void AddAmount(float addAmount){
+		SetAmount (amount + addAmount);
+	}
+
+	public void SetAmount(float setAmount){
+		amount = setAmount;
+		if (amount < 0) {
+			amount = 0;
+		}
+		if (amount > maxAmout) {
+			amount = maxAmout;
+		}
+		OnDataChanged ();
+	}
+
+	public bool IsMaxAmount(){
+		return amount == maxAmout;
 	}
 
 	void Update(){
 		RepositionBar ();
 	}
 
+	// Place the bar on the target's position
 	private void RepositionBar(){
 		Vector2 ViewportPosition = Camera.main.WorldToViewportPoint (targetFollow.position);
 		Vector2 WorldObject_ScreenPosition = new Vector2 (

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Waypoint : MonoBehaviour {
-
+[System.Serializable]
+public class Waypoint {
+	public Vector2 position;
 }

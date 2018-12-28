@@ -2,29 +2,49 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum State{
-	Patrol,
-	Chase
+public enum StartingState{
+	Patrol = 0,
+	Sleep = 2,
+	Idle = 3
 }
 
+public enum State{
+	Patrol,
+	Chase,
+	Sleep,
+	Idle,
+	Monitor
+}
+
+[RequireComponent(typeof (FieldOfView))]
 public class GuardController : Controller {
 
+	public StartingState startingState;
 	public Waypoint[] waypoints;
+	public float idleDuration;
 
 	private FieldOfView fov;
 	private int currentWaypointIndex = 0;
 	private Transform target;
+	private Vector3 monitorPos;
 
-	public State state;
+	private State state;
 
-	// Use this for initialization
+	// Value used in PlayerController
+	public bool EnableAbsorption(){
+		return state != State.Chase;
+	}
+
+	void Awake(){
+		SaveCurrentState ();
+	}
+
 	void Start () {
 		fov = GetComponent<FieldOfView> ();
-		state = State.Patrol;
+		state = (State) startingState;
 		UpdateController ();
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		Move ();
 		UpdateState ();
@@ -35,18 +55,22 @@ public class GuardController : Controller {
 			MoveToWaypoint (waypoints [currentWaypointIndex]);
 		}
 		if (state == State.Chase) {
-			MoveToTarget (target);
+			MoveToTarget (target.position);
+		}
+		if (state == State.Monitor) {
+			MoveToMonitor ();
 		}
 	}
 
 	void UpdateState(){
 		if (fov.visibleTargets.Count > 0) {
-			if (state == State.Patrol) {
+			Controller fovController = fov.visibleTargets [0].GetComponent<Controller> ();
+			if (state != State.Sleep && state != State.Chase && fovController.innerState.type == ControllerType.PLAYER) {
 				ChangeState (State.Chase);
 			}
 		} else {
 			if (state == State.Chase) {
-				ChangeState (State.Patrol);
+				ChangeState (State.Monitor);
 			}
 		}
 	}
@@ -56,35 +80,50 @@ public class GuardController : Controller {
 		if (s == State.Chase) {
 			target = fov.visibleTargets [0];
 		}
+		if (s == State.Monitor) {
+			monitorPos = target.position;
+		}
 		state = s;
 	}
 
-	void MoveToTarget(Transform target){
+	void MoveToTarget(Vector3 targetPos){
 		Vector3 currentPos = transform.position;
-		Vector3 targetPos = target.position;
 
+		// Normalize the direction or else the guard will be faster if he is far away
 		Vector3 dir = (targetPos - currentPos).normalized;
-		Debug.Log (dir);
-		transform.position += dir * characteristics.speed * Time.deltaTime;
+
+		transform.position += dir * innerState.characteristics.speed * Time.deltaTime / innerState.characteristics.decceleration;
+		// If the guard is moving
 		if (dir != Vector3.zero) {
 			float angle = Mathf.Atan2 (dir.x, dir.y) * Mathf.Rad2Deg;
 			transform.rotation = Quaternion.AngleAxis(angle,Vector3.back);
 		}
 	}
-
+		
 	void MoveToWaypoint(Waypoint waypoint){
 		Vector3 currentPos = transform.position;
-		Vector3 waypointPos = waypoint.transform.position;
-		Debug.Log (waypointPos);
-		Debug.Log (Vector3.Distance (currentPos, waypointPos));
+		Vector3 waypointPos = waypoint.position;
+
+		// Check if the guard is near the waypoint
 		if (Vector3.Distance (currentPos, waypointPos) < .1f) {
 			NextWaypoint ();
 		} else {
-			MoveToTarget (waypoint.transform);
+			MoveToTarget (waypoint.position);
 		}
 	}
 
+	// Change waypoint
 	void NextWaypoint(){
 		currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+	}
+
+	void MoveToMonitor(){
+		Vector3 currentPos = transform.position;
+
+		if (Vector3.Distance (currentPos, monitorPos) < .1f) {
+
+		} else {
+			MoveToTarget (monitorPos);
+		}
 	}
 }
