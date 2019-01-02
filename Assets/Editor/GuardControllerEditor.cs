@@ -20,6 +20,7 @@ public class GuardControllerEditor : Editor {
 
 	}
 
+	// Draw the waypoins and their number
 	void OnSceneGUI(){
 		GuardController gc = (GuardController)target;
 		Handles.color = Color.cyan;
@@ -32,6 +33,7 @@ public class GuardControllerEditor : Editor {
 		}
 	}
 
+	// Hide or show attribute depending on the StartingState
 	override public void OnInspectorGUI(){
 		serializedObject.Update ();
 

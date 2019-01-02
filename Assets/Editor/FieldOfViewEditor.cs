@@ -6,6 +6,7 @@ using UnityEditor;
 [CustomEditor (typeof (FieldOfView))]
 public class FieldOfViewEditor : Editor {
 
+	// Draw the circle and the fov on the editor view
 	void OnSceneGUI(){
 		FieldOfView fov = (FieldOfView)target;
 		Handles.color = Color.white;

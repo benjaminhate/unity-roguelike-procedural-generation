@@ -25,7 +25,7 @@ public class PlayerController : Controller {
 		rd2d = GetComponent<Rigidbody2D> ();
 	}
 
-	void Update () {
+	void FixedUpdate () {
 		Move ();
 		UpdateAbsorption ();
 	}
@@ -49,7 +49,7 @@ public class PlayerController : Controller {
 		moveHDelay = moveHorizontal;
 		moveVDelay = moveVertical;
 
-		transform.Translate (innerState.characteristics.speed * speedRate * Vector3.up * Time.deltaTime);
+		transform.Translate (innerState.characteristics.speed * speedRate * Vector3.up * Time.fixedDeltaTime);
 	}
 
 	void OnTriggerEnted2D(Collider2D other){
