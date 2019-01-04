@@ -91,8 +91,8 @@ public class PlayerController : Controller {
 		if (!absorbed) {
 			savedController = SaveController ();
 			absorbed = true;
-			timeAbsorbed = Time.time;
 		}
+		timeAbsorbed = Time.time;
 		Controller enemyController = enemy.GetComponent<Controller> ();
 		ChangePlayerController (enemyController.innerState);
 	}
