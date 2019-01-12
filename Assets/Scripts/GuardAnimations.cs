@@ -7,20 +7,22 @@ public class GuardAnimations : MonoBehaviour {
     public Animator animator;
 
     private State current_state;
+    private GuardController controller;
 
 	// Use this for initialization
 	void Start () {
+        controller = GetComponent<GuardController>();
         animator.SetBool("isIdle",true);
-        current_state = GuardController.GetState();
+        current_state = controller.GetState();
         SetAnimation(current_state);
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if (current_state != GuardController.GetState())
+        if (current_state != controller.GetState())
         {
-            current_state = GuardController.GetState();
+            current_state = controller.GetState();
             SetAnimation(current_state);
         }
 

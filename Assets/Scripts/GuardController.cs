@@ -29,11 +29,10 @@ public class GuardController : Controller {
 	private Vector3 monitorPos;
 
 	private State state;
-    private static State static_state;
 
-    public static State GetState()
+    public State GetState()
     {
-        return static_state;
+        return state;
     }
 
     // Value used in PlayerController
@@ -48,7 +47,6 @@ public class GuardController : Controller {
 	void Start () {
 		fov = GetComponent<FieldOfView> ();
 		state = (State) startingState;
-        static_state = state;
         UpdateController ();
 	}
 	
@@ -91,7 +89,6 @@ public class GuardController : Controller {
 			monitorPos = target.position;
 		}
 		state = s;
-        static_state = state;
     }
 
 	void MoveToTarget(Vector3 targetPos){

@@ -168,7 +168,7 @@ MonoBehaviour:
       sprite: {fileID: 0}
       color: {r: 0, g: 0, b: 0, a: 0}
       scale: {x: 0, y: 0, z: 0}
-  startingState: 0
+  startingState: 2
   waypoints:
   - position: {x: -8, y: 8}
   - position: {x: -8, y: -8}
