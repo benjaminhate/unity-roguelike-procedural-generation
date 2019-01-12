@@ -168,7 +168,7 @@ MonoBehaviour:
       sprite: {fileID: 0}
       color: {r: 0, g: 0, b: 0, a: 0}
       scale: {x: 0, y: 0, z: 0}
-  startingState: 2
+  startingState: 0
   waypoints:
   - position: {x: -8, y: 8}
   - position: {x: -8, y: -8}
@@ -295,7 +295,7 @@ Animator:
   m_GameObject: {fileID: 240184848}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 8cd1bdfee33699a4787b7c3c5a619374, type: 2}
+  m_Controller: {fileID: 9100000, guid: 019b4f411e5ea7341800fbcd9e9a54dd, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

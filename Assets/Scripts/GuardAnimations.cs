@@ -35,18 +35,34 @@ public class GuardAnimations : MonoBehaviour {
             animator.SetBool("isIdle", true);
             animator.SetBool("isWalking", false);
             animator.SetBool("isSleeping", false);
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isAbsorbed", false);
         }
         if (state == State.Patrol)
         {
             animator.SetBool("isIdle", false);
             animator.SetBool("isWalking", true);
             animator.SetBool("isSleeping", false);
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isAbsorbed", false);
         }
         if(state == State.Sleep)
         {
             animator.SetBool("isIdle", false);
             animator.SetBool("isWalking", false);
             animator.SetBool("isSleeping", true);
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isAbsorbed", false);
         }
+        if (state == State.Chase)
+        {
+            animator.SetBool("isIdle", false);
+            animator.SetBool("isWalking", false);
+            animator.SetBool("isSleeping", false);
+            animator.SetBool("isRunning", true);
+            animator.SetBool("isAbsorbed", false);
+        }
+        //Absorbtion ? Doit être enclenché par le joueur
+
     }
 }
