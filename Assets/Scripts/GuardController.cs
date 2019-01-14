@@ -30,8 +30,13 @@ public class GuardController : Controller {
 
 	private State state;
 
-	// Value used in PlayerController
-	public bool EnableAbsorption(){
+    public State GetState()
+    {
+        return state;
+    }
+
+    // Value used in PlayerController
+    public bool EnableAbsorption(){
 		return state != State.Chase;
 	}
 
@@ -42,7 +47,7 @@ public class GuardController : Controller {
 	void Start () {
 		fov = GetComponent<FieldOfView> ();
 		state = (State) startingState;
-		UpdateController ();
+        UpdateController ();
 	}
 	
 	void Update () {
@@ -84,7 +89,7 @@ public class GuardController : Controller {
 			monitorPos = target.position;
 		}
 		state = s;
-	}
+    }
 
 	void MoveToTarget(Vector3 targetPos){
 		Vector3 currentPos = transform.position;
