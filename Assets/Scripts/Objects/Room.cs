@@ -8,7 +8,7 @@ public class Room {
     public List<Vector2Int> corners;
     public Vector2Int door;
 
-    public Room(List<Vector2Int> corners, Vector2Int door)
+    public Room(Vector2Int door, List<Vector2Int> corners = null)
     {
         this.corners = corners;
         this.door = door;
