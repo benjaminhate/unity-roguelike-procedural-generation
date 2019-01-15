@@ -162,17 +162,18 @@ public class Floor
         // Doors' creation
         bool[] door_created_labels = new bool[label - 3]; // Every element is set to false by default
         uint[] visited_surfaces = new uint[label - 3];
+        float proba = 1.3F;
         for (int i = 1; i < width - 1; i++)
         {
             for (int j = 1; j < height - 1; j++)
             {
-                if (floor[i, j] == 0)
+                if (floor[i, j] == 0 && !IsWallCorner(new Vector2Int(i, j)))
                 {
                     uint[] labels = GetCloseNeighboursLabels(new Vector2Int(i, j));
                     /* Probability should depend on wall's length, and a door should be added in all cases */
                     if (labels[(int)Direction.LEFT] > 2 && !door_created_labels[labels[(int)Direction.LEFT] - 3])
                     {
-                        if (Random.Range(0.0F, 1.0F) < 1.0F / wall_surfaces[labels[(int)Direction.LEFT] - 3] || visited_surfaces[labels[(int)Direction.LEFT] - 3] >= wall_surfaces[labels[(int)Direction.LEFT] - 3] - 1)
+                        if (Random.Range(0.0F, 1.0F) < proba / wall_surfaces[labels[(int)Direction.LEFT] - 3] || visited_surfaces[labels[(int)Direction.LEFT] - 3] >= wall_surfaces[labels[(int)Direction.LEFT] - 3] - 1)
                         {
                             floor[i, j] = 2;
                             door_created_labels[labels[(int)Direction.LEFT] - 3] = true;
@@ -181,7 +182,7 @@ public class Floor
                     }
                     else if (labels[(int)Direction.UP] > 2 && !door_created_labels[labels[(int)Direction.UP] - 3])
                     {
-                        if (Random.Range(0.0F, 1.0F) < 1.0F / wall_surfaces[labels[(int)Direction.UP] - 3] || visited_surfaces[labels[(int)Direction.UP] - 3] >= wall_surfaces[labels[(int)Direction.UP] - 3] - 1)
+                        if (Random.Range(0.0F, 1.0F) < proba / wall_surfaces[labels[(int)Direction.UP] - 3] || visited_surfaces[labels[(int)Direction.UP] - 3] >= wall_surfaces[labels[(int)Direction.UP] - 3] - 1)
                         {
                             floor[i, j] = 2;
                             door_created_labels[labels[(int)Direction.UP] - 3] = true;
@@ -190,7 +191,7 @@ public class Floor
                     }
                     else if (labels[(int)Direction.RIGHT] > 2 && !door_created_labels[labels[(int)Direction.RIGHT] - 3])
                     {
-                        if (Random.Range(0.0F, 1.0F) < 1.0F / wall_surfaces[labels[(int)Direction.RIGHT] - 3] || visited_surfaces[labels[(int)Direction.RIGHT] - 3] >= wall_surfaces[labels[(int)Direction.RIGHT] - 3] - 1)
+                        if (Random.Range(0.0F, 1.0F) < proba / wall_surfaces[labels[(int)Direction.RIGHT] - 3] || visited_surfaces[labels[(int)Direction.RIGHT] - 3] >= wall_surfaces[labels[(int)Direction.RIGHT] - 3] - 1)
                         {
                             floor[i, j] = 2;
                             door_created_labels[labels[(int)Direction.RIGHT] - 3] = true;
@@ -199,7 +200,7 @@ public class Floor
                     }
                     else if (labels[(int)Direction.DOWN] > 2 && !door_created_labels[labels[(int)Direction.DOWN] - 3])
                     {
-                        if (Random.Range(0.0F, 1.0F) < 1.0F / wall_surfaces[labels[(int)Direction.DOWN] - 3] || visited_surfaces[labels[(int)Direction.DOWN] - 3] >= wall_surfaces[labels[(int)Direction.DOWN] - 3] - 1)
+                        if (Random.Range(0.0F, 1.0F) < proba / wall_surfaces[labels[(int)Direction.DOWN] - 3] || visited_surfaces[labels[(int)Direction.DOWN] - 3] >= wall_surfaces[labels[(int)Direction.DOWN] - 3] - 1)
                         {
                             floor[i, j] = 2;
                             door_created_labels[labels[(int)Direction.DOWN] - 3] = true;
@@ -494,6 +495,21 @@ public class Floor
                 if (floor[farther_neighbours[i][0], farther_neighbours[i][1]] > 2) return true;
             if (floor[farther_neighbours[0][0], farther_neighbours[0][1]] > 2) return true;
         }
+        return false;
+    }
+
+    public bool IsWallCorner(Vector2Int coord)
+    {
+        if (floor[coord.x, coord.y] != 0) return false;
+        Vector2Int[] neighbours = GetNeighbours(coord);
+        if (floor[neighbours[0].x, neighbours[0].y] == 0 && floor[neighbours[2].x, neighbours[2].y] == 0 && floor[neighbours[1].x, neighbours[1].y] > 2)
+            return true;
+        else if (floor[neighbours[2].x, neighbours[2].y] == 0 && floor[neighbours[4].x, neighbours[4].y] == 0 && floor[neighbours[3].x, neighbours[3].y] > 2)
+            return true;
+        else if (floor[neighbours[4].x, neighbours[4].y] == 0 && floor[neighbours[6].x, neighbours[6].y] == 0 && floor[neighbours[5].x, neighbours[5].y] > 2)
+            return true;
+        else if (floor[neighbours[6].x, neighbours[6].y] == 0 && floor[neighbours[0].x, neighbours[0].y] == 0 && floor[neighbours[7].x, neighbours[7].y] > 2)
+            return true;
         return false;
     }
 }
