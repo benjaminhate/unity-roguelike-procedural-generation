@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public enum Direction { LEFT = 0, UP, RIGHT, DOWN };
+//public enum Direction { LEFT = 0, UP, RIGHT, DOWN };
 
 public class GenerateFloor : MonoBehaviour
 {

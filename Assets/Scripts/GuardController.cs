@@ -27,6 +27,11 @@ public class GuardController : Controller {
 	private int currentWaypointIndex = 0;
 	private Transform target;
 	private Vector3 monitorPos;
+	private bool idleFromMonitor;
+
+	private float idleStart;
+	private bool idleStill;
+	private float initAngle;
 
 	private State state;
 
@@ -46,8 +51,9 @@ public class GuardController : Controller {
 
 	void Start () {
 		fov = GetComponent<FieldOfView> ();
-		state = (State) startingState;
+		ChangeState ((State) startingState);
         UpdateController ();
+		idleStill = idleDuration <= 0;
 	}
 	
 	void Update () {
@@ -64,6 +70,13 @@ public class GuardController : Controller {
 		}
 		if (state == State.Monitor) {
 			MoveToMonitor ();
+		}
+		if (state == State.Idle) {
+			if (idleStill) {
+				WaitIdle ();
+			} else {
+				MoveAroundIdle ();
+			}
 		}
 	}
 
@@ -87,6 +100,10 @@ public class GuardController : Controller {
 		}
 		if (s == State.Monitor) {
 			monitorPos = target.position;
+		}
+		if (s == State.Idle) {
+			idleStart = Time.time;
+			initAngle = transform.eulerAngles.z;
 		}
 		state = s;
     }
@@ -126,9 +143,33 @@ public class GuardController : Controller {
 		Vector3 currentPos = transform.position;
 
 		if (Vector3.Distance (currentPos, monitorPos) < .1f) {
-
+			idleFromMonitor = true;
+			ChangeState (State.Idle);
 		} else {
 			MoveToTarget (monitorPos);
+		}
+	}
+
+	void MoveAroundIdle(){
+		float percent = (Time.time - idleStart) / idleDuration;
+
+		if (percent > 1f) {
+			if (idleFromMonitor) {
+				ChangeState (State.Patrol);
+			} else {
+				idleStill = true;
+				idleStart = Time.time;
+			}
+		} else {
+			float angle = Mathf.Rad2Deg * Mathf.PI * 2.0f * percent + initAngle;
+			transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
+		}
+	}
+
+	void WaitIdle(){
+		if (Time.time - idleStart > idleDuration) {
+			idleStart = Time.time;
+			idleStill = false;
 		}
 	}
 }
