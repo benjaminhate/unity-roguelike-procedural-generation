@@ -16,21 +16,34 @@ public class Corridor {
         this.length = length;
     }
 
-    public bool IsIn(Vector2Int point)
+    public bool IsIn(Vector2Int coord)
     {
-        if (Vector2Int.Distance(point, start) >= length) return false;
-        switch(this.dir)
+        Vector2Int pos = this.start;
+        while (Vector2Int.Distance(pos, this.start) < this.length)
+        {
+            if (pos == coord) return true;
+            pos = this.Forward(pos);
+        }
+        return false;
+    }
+
+    public Vector2Int Forward(Vector2Int coord)
+    {
+        switch (this.dir)
         {
             case Direction.LEFT:
-                return (point.y <= start.y && point.x == start.x);
+                coord[0] -= 1;
+                break;
             case Direction.UP:
-                return (point.y == start.y && point.x >= start.x);
+                coord[1] += 1;
+                break;
             case Direction.RIGHT:
-                return (point.y >= start.y && point.x == start.x);
+                coord[0] += 1;
+                break;
             case Direction.DOWN:
-                return (point.y == start.y && point.x <= start.x);
-            default:
-                return false;
+                coord[1] -= 1;
+                break;
         }
+        return coord;
     }
 }

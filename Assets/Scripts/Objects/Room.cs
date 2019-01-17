@@ -10,8 +10,8 @@ public class Room {
 
     public Room(Vector2Int door, List<Vector2Int> corners = null)
     {
-        this.corners = corners;
         this.door = door;
+        this.corners = corners;
     }
 
     public bool IsInside(Vector2Int point)

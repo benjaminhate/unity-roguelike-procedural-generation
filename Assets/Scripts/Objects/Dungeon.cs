@@ -93,7 +93,7 @@ public class Dungeon
                     if (floor[neighbours[0].x, neighbours[0].y] > 2)
                         r[(int)floor[neighbours[0].x, neighbours[0].y] - 3].door = new Vector2Int(i, j);
                     else if (floor[neighbours[2].x, neighbours[2].y] > 2)
-                        r[(int)floor[neighbours[3].x, neighbours[2].y] - 3].door = new Vector2Int(i, j);
+                        r[(int)floor[neighbours[2].x, neighbours[2].y] - 3].door = new Vector2Int(i, j);
                     else if (floor[neighbours[4].x, neighbours[4].y] > 2)
                         r[(int)floor[neighbours[4].x, neighbours[4].y] - 3].door = new Vector2Int(i, j);
                     else if (floor[neighbours[6].x, neighbours[6].y] > 2)
@@ -105,6 +105,25 @@ public class Dungeon
         {
             if (r[t].corners.Count > 3) this.rooms.Add(r[t]);
         }
+    }
+
+    public void SortRoomsCorners() // Use Graham Scan algorithm
+    {
+        foreach(Room room in this.rooms)
+        {
+            room.corners = SortRoomCorners(room.corners);
+        }
+    }
+
+    public List<Vector2Int> SortRoomCorners(List<Vector2Int> corners) // We suppose the rooms are not too complex
+    {
+        List<Vector2Int> sorted_corners = new List<Vector2Int>();
+        sorted_corners.Add(corners[0]);
+        while (sorted_corners.Count < corners.Count)
+        {
+
+        }
+        return sorted_corners;
     }
     
 
