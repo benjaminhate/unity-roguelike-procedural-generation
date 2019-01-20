@@ -120,7 +120,7 @@ public class Floor
         {
             for (int j = 1; j < height - 1; j++)
             {
-                if (floor[i, j] > 2 && room_surfaces[floor[i, j] - 3] < Mathf.Min(width, height)) floor[i, j] = 0;
+                if (floor[i, j] > 2 && room_surfaces[floor[i, j] - 3] < Mathf.Min(width, height) / 2.0f) floor[i, j] = 0;
             }
         }
 

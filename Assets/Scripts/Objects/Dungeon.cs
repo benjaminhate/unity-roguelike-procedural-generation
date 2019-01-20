@@ -30,7 +30,7 @@ public class Dungeon
 
         /* Rooms */
         AddRooms(floor, f.GetNumberOfRooms());
-        
+        SortRoomsCorners();
     }
 
     /* Main functions */
@@ -115,19 +115,49 @@ public class Dungeon
         }
     }
 
-    public List<Vector2Int> SortRoomCorners(List<Vector2Int> corners) // We suppose the rooms are not too complex
+    public List<Vector2Int> SortRoomCorners(List<Vector2Int> corners) // Only works for square rooms
     {
         List<Vector2Int> sorted_corners = new List<Vector2Int>();
-        sorted_corners.Add(corners[0]);
-        while (sorted_corners.Count < corners.Count)
+        Vector2 centre = FindCentroid(corners);
+        foreach(Vector2Int corner in corners)
         {
-
+            int index = 0;
+            while (index < sorted_corners.Count)
+            {
+                if (GetAngle(centre, corner) < GetAngle(centre, sorted_corners[index])) break;
+                index++;
+            }
+            sorted_corners.Insert(index, corner);
         }
         return sorted_corners;
     }
     
 
     /* Auxiliary functions */
+
+    public float GetAngle(Vector2 p1, Vector2 p2)
+    {
+        Vector2 diff = p2 - p1;
+        if (diff.x >= 0 && diff.y >= 0) // Top-Right
+            return Mathf.Atan2(diff.y, diff.x);
+        else if (diff.x < 0 && diff.y >= 0) // Top-Left
+            return Mathf.Atan2(diff.y, diff.x);
+        else if (diff.x < 0 && diff.y < 0) // Bottom-Left
+            return Mathf.Atan2(diff.y, diff.x) + 2 * Mathf.PI;
+        else if (diff.x >= 0 && diff.y < 0) // Bottom-Right
+            return Mathf.Atan2(diff.y, diff.x) + 2 * Mathf.PI;
+        return 0f;
+    }
+
+    public Vector2 FindCentroid(List<Vector2Int> corners)
+    {
+        Vector2 centre = new Vector2(0f, 0f);
+        foreach (Vector2Int corner in corners)
+        {
+            centre += corner;
+        }
+        return centre / corners.Count;
+    }
 
     public bool IsRoomCorner(uint[,] floor, Vector2Int coord)
     {
