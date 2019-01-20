@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 8
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -39,7 +39,6 @@ RenderSettings:
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
   m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
-  m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -55,10 +54,11 @@ LightmapSettings:
     m_EnableBakedLightmaps: 0
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 10
+    serializedVersion: 9
     m_Resolution: 2
     m_BakeResolution: 40
-    m_AtlasSize: 1024
+    m_TextureWidth: 1024
+    m_TextureHeight: 1024
     m_AO: 0
     m_AOMaxDistance: 1
     m_CompAOExponent: 1
@@ -203,12 +203,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2003902791}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 532f0402aba59b74cb41e852b4bdf228, type: 3}
+  m_Script: {fileID: 11500000, guid: d0344072f2578fe41869dfdc1cba1d1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tile_size: 2
-  corridor_tile: {fileID: 1553267369897734, guid: 941b7785137050c4e96a82f4059b1408,
+  tile_size: 1
+  corridor_tile: {fileID: 1553267369897734, guid: 93d1da81f82ec0b499a8467f1e100795,
     type: 2}
-  room_tile: {fileID: 1189400146903362, guid: d49fe5ac7e00fc546807c7d4d04a45c1, type: 2}
-  door_tile: {fileID: 1792345498846518, guid: 7508cfee511e2e249b0b8dfcd772ffc5, type: 2}
-  wall_tile: {fileID: 1856091973809688, guid: 4b27214ed9a7bcd49ad9556281e934b3, type: 2}
+  room_tile: {fileID: 1189400146903362, guid: 61a7afca141ee3442b4b3a59e26520aa, type: 2}
+  door_tile: {fileID: 1792345498846518, guid: 29462f30ad5015c4eb020af8bf83b97e, type: 2}
+  wall_tile: {fileID: 1856091973809688, guid: 315faa9236c19d648b7efc6aca56bce7, type: 2}

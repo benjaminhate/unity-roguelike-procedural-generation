@@ -7,4 +7,6 @@ public class SpriteManager {
 	public Sprite sprite;
 	public Color color;
 	public Vector3 scale;
+
+	public RuntimeAnimatorController anim;
 }

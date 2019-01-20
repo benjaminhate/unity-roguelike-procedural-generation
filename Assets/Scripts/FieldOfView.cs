@@ -152,6 +152,7 @@ public class FieldOfView : MonoBehaviour {
 		viewMesh.vertices = vertices;
 		viewMesh.triangles = triangles;
 		viewMesh.RecalculateNormals ();
+		viewMeshFilter.transform.rotation = transform.rotation;
 	}
 
 	// Dichotomical method to find wall edges

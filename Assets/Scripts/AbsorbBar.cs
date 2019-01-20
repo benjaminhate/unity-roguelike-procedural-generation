@@ -51,6 +51,10 @@ public class AbsorbBar : MonoBehaviour {
 		return amount == maxAmout;
 	}
 
+	public void Destroy(){
+		Destroy (bar.gameObject);
+	}
+
 	void Update(){
 		RepositionBar ();
 	}

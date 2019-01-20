@@ -11,6 +11,9 @@ public class PlayerController : Controller {
 	private float moveVDelay = 0f;
 
 	private Rigidbody2D rd2d;
+	private AnimationController anim;
+	private FieldOfView fov;
+	private bool isMoving;
 
 	private ControllerState savedController = null;
 	private bool absorbed = false;
@@ -21,6 +24,8 @@ public class PlayerController : Controller {
 	}
 
 	void Start(){
+		anim = GetComponent<AnimationController> ();
+		fov = GetComponentInChildren<FieldOfView> ();
 		UpdateController ();
 		rd2d = GetComponent<Rigidbody2D> ();
 	}
@@ -28,6 +33,7 @@ public class PlayerController : Controller {
 	void FixedUpdate () {
 		Move ();
 		UpdateAbsorption ();
+		UpdateAnim ();
 	}
 
 	void Move(){
@@ -37,10 +43,12 @@ public class PlayerController : Controller {
 		float speedRate = Mathf.Max (Mathf.Abs (moveVertical), Mathf.Abs (moveHorizontal))/innerState.characteristics.decceleration;
 		float rot = Mathf.Rad2Deg * Mathf.Atan2 (-moveHorizontal, moveVertical);
 
+		isMoving = moveVertical != 0 || moveHorizontal != 0;
+
 		// If the character is accelerating
 		if ((Mathf.Abs (moveHorizontal) != 0 && Mathf.Abs (moveHorizontal) - Mathf.Abs (moveHDelay) >= 0 )
 			|| (Mathf.Abs (moveVertical) != 0 & Mathf.Abs (moveVertical) - Mathf.Abs (moveVDelay) >= 0)) {
-			rd2d.rotation = rot;
+			fov.transform.rotation = Quaternion.AngleAxis (rot, Vector3.forward);
 			// Remove the effect of decceleration
 			speedRate *= innerState.characteristics.decceleration;
 		}
@@ -49,7 +57,9 @@ public class PlayerController : Controller {
 		moveHDelay = moveHorizontal;
 		moveVDelay = moveVertical;
 
-		transform.Translate (innerState.characteristics.speed * speedRate * Vector3.up * Time.fixedDeltaTime);
+		Vector2 forward = new Vector2 (moveHorizontal, moveVertical);
+
+		transform.Translate (innerState.characteristics.speed * speedRate * forward * Time.fixedDeltaTime);
 	}
 
 	void OnTriggerEnted2D(Collider2D other){
@@ -72,6 +82,7 @@ public class PlayerController : Controller {
 				// When it is at max, we can absorb with the Key E
 				if (other.GetComponent<AbsorbBar> ().IsMaxAmount () && Input.GetKey (KeyCode.E)) {
 					Debug.Log ("ABSORBED");
+					other.GetComponent<AbsorbBar> ().Destroy ();
 					Absorbtion (other.gameObject);
 					Destroy (other.gameObject);
 				}
@@ -111,5 +122,12 @@ public class PlayerController : Controller {
 			ChangePlayerController (savedController);
 			savedController = null;
 		}
+	}
+
+	void UpdateAnim(){
+		anim.animSpeed = innerState.characteristics.speed / 10f;
+		anim.rotController = fov.transform;
+		anim.isMoving = isMoving;
+		anim.UpdateAnimator ();
 	}
 }

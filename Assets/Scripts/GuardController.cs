@@ -16,7 +16,6 @@ public enum State{
 	Monitor
 }
 
-[RequireComponent(typeof (FieldOfView))]
 public class GuardController : Controller {
 
 	public StartingState startingState;
@@ -33,7 +32,10 @@ public class GuardController : Controller {
 	private bool idleStill;
 	private float initAngle;
 
+	private AnimationController anim;
+
 	private State state;
+	private bool isMoving;
 
     public State GetState()
     {
@@ -50,7 +52,8 @@ public class GuardController : Controller {
 	}
 
 	void Start () {
-		fov = GetComponent<FieldOfView> ();
+		anim = GetComponent<AnimationController> ();
+		fov = GetComponentInChildren<FieldOfView> ();
 		ChangeState ((State) startingState);
         UpdateController ();
 		idleStill = idleDuration <= 0;
@@ -59,9 +62,11 @@ public class GuardController : Controller {
 	void Update () {
 		Move ();
 		UpdateState ();
+		UpdateAnim ();
 	}
 
 	void Move(){
+		isMoving = false;
 		if (state == State.Patrol) {
 			MoveToWaypoint (waypoints [currentWaypointIndex]);
 		}
@@ -116,9 +121,10 @@ public class GuardController : Controller {
 
 		transform.position += dir * innerState.characteristics.speed * Time.deltaTime / innerState.characteristics.decceleration;
 		// If the guard is moving
-		if (dir != Vector3.zero) {
+		isMoving = dir != Vector3.zero;
+		if (isMoving) {
 			float angle = Mathf.Atan2 (dir.x, dir.y) * Mathf.Rad2Deg;
-			transform.rotation = Quaternion.AngleAxis(angle,Vector3.back);
+			fov.transform.rotation = Quaternion.AngleAxis(angle,Vector3.back);
 		}
 	}
 		
@@ -162,7 +168,7 @@ public class GuardController : Controller {
 			}
 		} else {
 			float angle = Mathf.Rad2Deg * Mathf.PI * 2.0f * percent + initAngle;
-			transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
+			fov.transform.rotation = Quaternion.AngleAxis (angle, Vector3.forward);
 		}
 	}
 
@@ -171,5 +177,12 @@ public class GuardController : Controller {
 			idleStart = Time.time;
 			idleStill = false;
 		}
+	}
+
+	void UpdateAnim(){
+		anim.animSpeed = innerState.characteristics.speed / 10f;
+		anim.rotController = fov.transform;
+		anim.isMoving = isMoving;
+		anim.UpdateAnimator ();
 	}
 }

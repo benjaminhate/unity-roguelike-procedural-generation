@@ -29,6 +29,7 @@ public class Controller : MonoBehaviour{
 		GetComponent<SpriteRenderer> ().sprite = innerState.spriteManager.sprite;
 		GetComponent<SpriteRenderer> ().color = innerState.spriteManager.color;
 		transform.localScale = innerState.spriteManager.scale;
+		GetComponent<Animator> ().runtimeAnimatorController = innerState.spriteManager.anim;
 	}
 
 	// Save the sprite state
@@ -36,6 +37,7 @@ public class Controller : MonoBehaviour{
 		innerState.spriteManager.sprite = GetComponent<SpriteRenderer> ().sprite;
 		innerState.spriteManager.color = GetComponent<SpriteRenderer> ().color;
 		innerState.spriteManager.scale = transform.localScale;
+		innerState.spriteManager.anim = GetComponent<Animator> ().runtimeAnimatorController;
 	}
 
 	// Return the state of the controller
