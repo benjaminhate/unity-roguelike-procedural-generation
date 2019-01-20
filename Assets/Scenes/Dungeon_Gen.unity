@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 2003902794}
   - component: {fileID: 2003902793}
   - component: {fileID: 2003902792}
-  - component: {fileID: 2003902797}
+  - component: {fileID: 2003902796}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -166,7 +166,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4.901598
+  orthographic size: 50.662277
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -189,13 +189,13 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2003902791}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 50, y: 50, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2003902797
+--- !u!114 &2003902796
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -203,13 +203,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2003902791}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0aa2084ca82cb2547b7ae509e58074c5, type: 3}
+  m_Script: {fileID: 11500000, guid: 532f0402aba59b74cb41e852b4bdf228, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  height: 50
-  width: 50
-  wall_tile: {fileID: 1856091973809688, guid: 4b27214ed9a7bcd49ad9556281e934b3, type: 2}
+  tile_size: 2
   corridor_tile: {fileID: 1553267369897734, guid: 941b7785137050c4e96a82f4059b1408,
     type: 2}
   room_tile: {fileID: 1189400146903362, guid: d49fe5ac7e00fc546807c7d4d04a45c1, type: 2}
   door_tile: {fileID: 1792345498846518, guid: 7508cfee511e2e249b0b8dfcd772ffc5, type: 2}
+  wall_tile: {fileID: 1856091973809688, guid: 4b27214ed9a7bcd49ad9556281e934b3, type: 2}
