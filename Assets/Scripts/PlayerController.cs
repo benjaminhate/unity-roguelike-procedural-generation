@@ -7,6 +7,11 @@ public class PlayerController : Controller {
 
 	public float absorptionDuration;
 
+	public float staminaDrain;
+	public float maxStamina;
+	[SerializeField]
+	private float stamina;
+
 	private float moveHDelay = 0f;
 	private float moveVDelay = 0f;
 
@@ -24,6 +29,7 @@ public class PlayerController : Controller {
 	}
 
 	void Start(){
+		stamina = maxStamina;
 		anim = GetComponent<AnimationController> ();
 		fov = GetComponentInChildren<FieldOfView> ();
 		UpdateController ();
@@ -58,6 +64,19 @@ public class PlayerController : Controller {
 		moveVDelay = moveVertical;
 
 		Vector2 forward = new Vector2 (moveHorizontal, moveVertical);
+
+		if (Input.GetKey (KeyCode.LeftShift)) {
+			if (isMoving && stamina > 0) {
+				speedRate *= 2;
+				stamina -= staminaDrain * Time.deltaTime;
+				if (stamina < 0)
+					stamina = 0;
+			}
+		} else if(stamina < maxStamina) {
+			stamina += staminaDrain * Time.deltaTime / 2f;
+			if (stamina > maxStamina)
+				stamina = maxStamina;
+		}
 
 		transform.Translate (innerState.characteristics.speed * speedRate * forward * Time.fixedDeltaTime);
 	}
