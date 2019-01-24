@@ -10,6 +10,8 @@ public class Dungeon
     public List<Corridor> corridors;
     public List<Room> rooms;
 
+    public uint[,] floor;
+
     public Dungeon(uint height = 50, uint width = 50)
     {
         /* Initialisation of attributes */
@@ -23,7 +25,7 @@ public class Dungeon
 
         /* 2D array representing the level */
         Floor f = new Floor(height, width);
-        uint[,] floor = f.GetFloor();
+        this.floor = f.GetFloor(); 
 
         /* Corridors */
         AddCorridors(floor);
@@ -37,7 +39,6 @@ public class Dungeon
 
     public void AddCorridors(uint[,] floor)
     {
-        int height = floor.GetLength(0), width = floor.GetLength(1);
         // Vertical corridors
         for (int i = 1; i < width - 1; i++)
         {
@@ -78,9 +79,8 @@ public class Dungeon
 
     public void AddRooms(uint[,] floor, uint n_rooms)
     {
-        int height = floor.GetLength(0), width = floor.GetLength(1);
-        Room[] r = new Room[n_rooms * 10];
-        for (uint t = 0; t < n_rooms * 10; t++) r[t] = new Room(new Vector2Int(0, 0), new List<Vector2Int>());
+        Room[] r = new Room[n_rooms * 50];
+        for (uint t = 0; t < n_rooms * 50; t++) r[t] = new Room(new Vector2Int(0, 0), new List<Vector2Int>());
         for (int i = 1; i < width - 1; i++)
         {
             for (int j = 1; j < height - 1; j++)
@@ -101,7 +101,7 @@ public class Dungeon
                 }
             }
         }
-        for (uint t = 0; t < n_rooms * 10; t++)
+        for (uint t = 0; t < n_rooms * 50; t++) 
         {
             if (r[t].corners.Count > 3) this.rooms.Add(r[t]);
         }
@@ -111,11 +111,14 @@ public class Dungeon
     {
         foreach(Room room in this.rooms)
         {
-            room.corners = SortRoomCorners(room.corners);
+            if (room.corners.Count == 4)
+                room.corners = SortSquareRoomCorners(room.corners);
+            else
+                room.corners = SortRoomCorners(room.corners);
         }
     }
 
-    public List<Vector2Int> SortRoomCorners(List<Vector2Int> corners) // Only works for square rooms
+    public List<Vector2Int> SortSquareRoomCorners(List<Vector2Int> corners) // Only works for square rooms
     {
         List<Vector2Int> sorted_corners = new List<Vector2Int>();
         Vector2 centre = FindCentroid(corners);
@@ -130,6 +133,101 @@ public class Dungeon
             sorted_corners.Insert(index, corner);
         }
         return sorted_corners;
+    }
+
+    public List<Vector2Int> SortRoomCorners(List<Vector2Int> corners) // For non square rooms
+    {
+        List<Vector2Int> sorted_corners = new List<Vector2Int>();
+        sorted_corners.Add(corners[0]);
+        Vector2Int[] vertices = GetConnectedVertices(sorted_corners[sorted_corners.Count - 1], corners);
+        Vector2 centroid = FindCentroid(corners);
+        int previous_move = 0;
+        if (vertices[0] == new Vector2Int(0, 0) && vertices[1] == new Vector2Int(0, 0))
+            previous_move = (centroid.x > corners[0].x) ? 2 : 3;
+        else if (vertices[1] == new Vector2Int(0, 0) && vertices[2] == new Vector2Int(0, 0))
+            previous_move = (centroid.y > corners[0].y) ? 0 : 3;
+        else if (vertices[2] == new Vector2Int(0, 0) && vertices[3] == new Vector2Int(0, 0))
+            previous_move = (centroid.x < corners[0].x) ? 0 : 1;
+        else if (vertices[3] == new Vector2Int(0, 0) && vertices[0] == new Vector2Int(0, 0))
+            previous_move = (centroid.y < corners[0].y) ? 2 : 1;
+        int i = 0;
+        while (sorted_corners.Count < corners.Count && i < 25)
+        {
+            i++;
+            vertices = GetConnectedVertices(sorted_corners[sorted_corners.Count - 1], corners);
+            if (vertices[0] == new Vector2Int(0, 0) && vertices[1] == new Vector2Int(0, 0))
+            {
+                if (previous_move == 3)
+                {
+                    sorted_corners.Add(vertices[2]);
+                    previous_move = 0;
+                }
+                else if (previous_move == 2)
+                {
+                    sorted_corners.Add(vertices[3]);
+                    previous_move = 1;
+                }     
+            }
+            else if (vertices[1] == new Vector2Int(0, 0) && vertices[2] == new Vector2Int(0, 0))
+            {
+                if (previous_move == 3)
+                {
+                    sorted_corners.Add(vertices[0]);
+                    previous_move = 2;
+                }
+                else if (previous_move == 0)
+                {
+                    sorted_corners.Add(vertices[3]);
+                    previous_move = 1;
+                }
+            }
+            else if (vertices[2] == new Vector2Int(0, 0) && vertices[3] == new Vector2Int(0, 0))
+            {
+                if (previous_move == 1)
+                {
+                    sorted_corners.Add(vertices[0]);
+                    previous_move = 2;
+                }
+                else if (previous_move == 0)
+                {
+                    sorted_corners.Add(vertices[1]);
+                    previous_move = 3;
+                }
+            }
+            else if (vertices[3] == new Vector2Int(0, 0) && vertices[0] == new Vector2Int(0, 0))
+            {
+                if (previous_move == 1)
+                {
+                    sorted_corners.Add(vertices[2]);
+                    previous_move = 0;
+                }
+                else if (previous_move == 2)
+                {
+                    sorted_corners.Add(vertices[1]);
+                    previous_move = 3;
+                }
+            }
+        }
+        return sorted_corners;
+    }
+
+    public Vector2Int[] GetConnectedVertices(Vector2Int vertex, List<Vector2Int> corners)
+    {
+        Vector2Int[] vertices = new Vector2Int[4]; // Left, Top, Right, Bottom
+        for (int i = 0; i < 4; i++)
+            vertices[i] = new Vector2Int(0, 0);
+        foreach (Vector2Int corner in corners)
+        {
+            if (corner.x < vertex.x && corner.y == vertex.y)
+                vertices[0] = corner;
+            else if (corner.x > vertex.x && corner.y == vertex.y)
+                vertices[2] = corner;
+            else if (corner.x == vertex.x && corner.y < vertex.y)
+                vertices[3] = corner;
+            else if (corner.x == vertex.x && corner.y > vertex.y)
+                vertices[1] = corner;
+        }
+        return vertices;
     }
     
 
@@ -158,6 +256,28 @@ public class Dungeon
         }
         return centre / corners.Count;
     }
+
+    public Vector2[] GetBoundingBox(List<Vector2Int> corners)
+    {
+        float big_number = 100000000000f;
+        Vector2 bottom_left = new Vector2(big_number, big_number), top_right = -bottom_left;
+        foreach (Vector2Int corner in corners)
+        {
+            if (corner.x < bottom_left.x)
+                bottom_left.x = corner.x;
+            else if (corner.x > top_right.x)
+                top_right.x = corner.x;
+            if (corner.y < bottom_left.y)
+                bottom_left.y = corner.y;
+            else if (corner.y > top_right.y)
+                top_right.y = corner.y;
+        }
+        Vector2[] bounding_box = new Vector2[2];
+        bounding_box[0] = bottom_left;
+        bounding_box[1] = top_right;
+        return bounding_box;
+    }
+
 
     public bool IsRoomCorner(uint[,] floor, Vector2Int coord)
     {
