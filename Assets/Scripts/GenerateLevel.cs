@@ -5,28 +5,64 @@ using UnityEngine;
 public class GenerateLevel : MonoBehaviour {
     /* Parameters */
     public uint tile_size;
+    public int height = 50, width = 50;
     public GameObject corridor_tile, room_tile, door_tile, wall_tile;
 
 	// Use this for initialization
 	void Start () {
-        Dungeon dungeon = new Dungeon();
+        Dungeon dungeon = new Dungeon((uint)height, (uint)width);
 
         // Removing non squared rooms
         Room[] rooms = new Room[dungeon.rooms.Count];
         dungeon.rooms.CopyTo(rooms);
-        foreach (Room room in rooms)
+        foreach (Room room in rooms) // Removing non squared rooms
         {
-            if (room.corners.Count != 4) dungeon.rooms.Remove(room);
+            //if (room.corners.Count != 4) dungeon.rooms.Remove(room);
         }
 
-        InstantiateCorridors(dungeon.corridors);
-        InstantiateRooms(dungeon.rooms);
+        //InstantiateCorridors(dungeon.corridors);
+        //InstantiateRooms(dungeon.rooms);
 
         Debug.Log(dungeon.corridors.Count + " corridors");
         Debug.Log(dungeon.rooms.Count + " rooms");
 
-        InstantiateWalls(dungeon.corridors, dungeon.rooms);
-	}
+        //InstantiateWalls(dungeon.corridors, dungeon.rooms);
+
+        // Floor's Instantiation
+        for (int i = 1; i < width - 1; i++)
+        {
+            // j == 0
+            if (dungeon.floor[i - 1, 0] != 0 || dungeon.floor[i + 1, 0] != 0 || dungeon.floor[i, 1] != 0)
+                Instantiate(wall_tile, tile_size * new Vector3(i, 0, 0), Quaternion.identity);
+            // j == height - 1
+            if (dungeon.floor[i - 1, height - 1] != 0 || dungeon.floor[i + 1, height - 1] != 0 || dungeon.floor[i, height - 2] != 0)
+                Instantiate(wall_tile, tile_size * new Vector3(i, height - 1, 0), Quaternion.identity);
+        }
+        for (int j = 1; j < height - 1; j++)
+        {
+            // i == 0
+            if (dungeon.floor[0, j + 1] != 0 || dungeon.floor[0, j - 1] != 0 || dungeon.floor[1, j] != 0)
+                Instantiate(wall_tile, tile_size * new Vector3(0, j, 0), Quaternion.identity);
+            // i == width - 1
+            if (dungeon.floor[width - 1, j + 1] != 0 || dungeon.floor[width - 1, j + 1] != 0 || dungeon.floor[width - 2, j] != 0)
+                Instantiate(wall_tile, tile_size * new Vector3(width - 1, j, 0), Quaternion.identity);
+        }   
+
+        for (int i = 1; i < width - 1; i++)
+        {
+            for (int j = 1; j < height - 1; j++)
+            {
+                if (dungeon.floor[i, j] == 0 && (dungeon.floor[i + 1, j] != 0 || dungeon.floor[i - 1, j] != 0 || dungeon.floor[i, j + 1] != 0 || dungeon.floor[i, j - 1] != 0))
+                    Instantiate(wall_tile, tile_size * new Vector3(i, j, 0), Quaternion.identity);
+                else if (dungeon.floor[i, j] == 1)
+                    Instantiate(corridor_tile, tile_size * new Vector3(i, j, 0), Quaternion.identity);
+                else if (dungeon.floor[i, j] == 2)
+                    Instantiate(door_tile, tile_size * new Vector3(i, j, 0), Quaternion.identity);
+                else if (dungeon.floor[i, j] > 2)
+                    Instantiate(room_tile, tile_size * new Vector3(i, j, 0), Quaternion.identity);
+            }
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -129,6 +165,9 @@ public class GenerateLevel : MonoBehaviour {
 
     void InstantiateRoomWalls(Room room)
     {
+        uint offset = 1;
+        if (room.corners.Count == 4)
+            offset = 2;
         Corridor corridor;
         Direction dir;
         Vector2Int pos;
@@ -151,8 +190,8 @@ public class GenerateLevel : MonoBehaviour {
                     pos = new Vector2Int(-1, 0);
                     break;
             }
-
-            corridor = new Corridor(room.corners[i] + pos, dir, (uint)Vector2Int.Distance(room.corners[i], room.corners[i + 1]) + 2);
+            
+            corridor = new Corridor(room.corners[i] + pos, dir, (uint)Vector2Int.Distance(room.corners[i], room.corners[i + 1]) + offset);
             InstantiateCorridor(corridor, wall_tile, room);
         }
         dir = GetDirection(room.corners[room.corners.Count - 1], room.corners[0]);
@@ -172,7 +211,7 @@ public class GenerateLevel : MonoBehaviour {
                 pos = new Vector2Int(-1, 0);
                 break;
         }
-        corridor = new Corridor(room.corners[room.corners.Count - 1] + pos, dir, (uint)Vector2Int.Distance(room.corners[room.corners.Count - 1], room.corners[0]) + 2);
+        corridor = new Corridor(room.corners[room.corners.Count - 1] + pos, dir, (uint)Vector2Int.Distance(room.corners[room.corners.Count - 1], room.corners[0]) + offset);
         InstantiateCorridor(corridor, wall_tile, room);
     }
 
