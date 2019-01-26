@@ -126,8 +126,8 @@ GameObject:
   - component: {fileID: 240184852}
   - component: {fileID: 240184851}
   - component: {fileID: 240184850}
-  - component: {fileID: 240184849}
   - component: {fileID: 240184856}
+  - component: {fileID: 240184849}
   m_Layer: 0
   m_Name: Guard
   m_TagString: Enemy
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 240184848}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95cfcad09146ece42aded863ee1d398f, type: 3}
+  m_Script: {fileID: 11500000, guid: 426a93adc925dff488504341f62b44d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 240184856}
@@ -168,6 +168,7 @@ MonoBehaviour:
       sprite: {fileID: 0}
       color: {r: 0, g: 0, b: 0, a: 0}
       scale: {x: 0, y: 0, z: 0}
+      anim: {fileID: 0}
   startingState: 0
   waypoints:
   - position: {x: -8, y: 8}
@@ -295,7 +296,7 @@ Animator:
   m_GameObject: {fileID: 240184848}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 019b4f411e5ea7341800fbcd9e9a54dd, type: 2}
+  m_Controller: {fileID: 9100000, guid: 8cec2ff833b0ba0468e3b8fd84bd086a, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

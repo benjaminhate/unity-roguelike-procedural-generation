@@ -13,25 +13,25 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: isWalking
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: isRunning
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: isAbsorbed
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -45,6 +45,28 @@ AnimatorController:
     m_IKPass: 0
     m_SyncedLayerAffectsTiming: 0
     m_Controller: {fileID: 9100000}
+--- !u!114 &114336773834284516
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcd350a4934ea0a41b3344572433b596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &114444892956121196
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2527955c1b1a01e4cb6b8a21f6334158, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114506900645113242
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -76,6 +98,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 613743b5ea9faa74b91da45b15e51291, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &114969151444363896
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9ac7142a96e5664b930c45104279864, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1101 &1101032149435368772
@@ -210,7 +243,7 @@ AnimatorState:
   m_Transitions:
   - {fileID: 1101742551387369648}
   m_StateMachineBehaviours:
-  - {fileID: 114818873588017060}
+  - {fileID: 114969151444363896}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -219,7 +252,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: e7a25ca2efd9e25468baf2d37cab0a6c, type: 2}
+  m_Motion: {fileID: 7400000, guid: 845b06d0f14a6154c88cbd84d70bc155, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -236,7 +269,7 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours:
-  - {fileID: 114552135669603648}
+  - {fileID: 114444892956121196}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -245,7 +278,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 2c6d91fdccd10304aa51e9753f104eab, type: 2}
+  m_Motion: {fileID: 7400000, guid: 105fcbd7d759e654996ee62a7ac969b4, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -257,7 +290,7 @@ AnimatorState:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Ninja_absorption_animation
+  m_Name: Absorption_animation
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -270,7 +303,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 0}
+  m_Motion: {fileID: 7400000, guid: 1455997aafdb84b44bce1ecb64a881c2, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -288,7 +321,7 @@ AnimatorState:
   m_Transitions:
   - {fileID: 1101759406196421776}
   m_StateMachineBehaviours:
-  - {fileID: 114506900645113242}
+  - {fileID: 114336773834284516}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -297,7 +330,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: e7a25ca2efd9e25468baf2d37cab0a6c, type: 2}
+  m_Motion: {fileID: 7400000, guid: 845b06d0f14a6154c88cbd84d70bc155, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
