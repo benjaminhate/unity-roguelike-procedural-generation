@@ -113,6 +113,56 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &681405559
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 4822526839103576, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+      propertyPath: m_LocalScale.z
+      value: 200
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 33db4cf88b6576448b09bd2e4997c4ce, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &2003902791
 GameObject:
   m_ObjectHideFlags: 0
@@ -206,9 +256,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0344072f2578fe41869dfdc1cba1d1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tile_size: 1
+  tile_size: 2
+  height: 50
+  width: 50
   corridor_tile: {fileID: 1553267369897734, guid: 93d1da81f82ec0b499a8467f1e100795,
     type: 2}
   room_tile: {fileID: 1189400146903362, guid: 61a7afca141ee3442b4b3a59e26520aa, type: 2}
   door_tile: {fileID: 1792345498846518, guid: 29462f30ad5015c4eb020af8bf83b97e, type: 2}
   wall_tile: {fileID: 1856091973809688, guid: 315faa9236c19d648b7efc6aca56bce7, type: 2}
+  guardPrefab: {fileID: 1591223528997328, guid: e1fc44fa9ec443e47aba67952823a796,
+    type: 2}

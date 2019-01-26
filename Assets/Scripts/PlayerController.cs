@@ -144,7 +144,7 @@ public class PlayerController : Controller {
 	}
 
 	void UpdateAnim(){
-		anim.animSpeed = innerState.characteristics.speed / 10f;
+		anim.animSpeed = innerState.characteristics.speed / 20f;
 		anim.rotController = fov.transform;
 		anim.isMoving = isMoving;
 		anim.UpdateAnimator ();

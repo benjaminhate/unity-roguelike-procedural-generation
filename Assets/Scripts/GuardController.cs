@@ -1,18 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum StartingState{
 	Patrol = 0,
-	Sleep = 2,
-	Idle = 3
+	Sleep = 1,
+	Idle = 2
 }
 
 public enum State{
 	Patrol,
-	Chase,
 	Sleep,
 	Idle,
+	Chase,
 	Monitor
 }
 
@@ -63,6 +64,9 @@ public class GuardController : Controller {
 		Move ();
 		UpdateState ();
 		UpdateAnim ();
+		if (state == State.Chase && Vector2.Distance (target.position,transform.position) < 3f) {
+			SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+		}
 	}
 
 	void Move(){
@@ -180,7 +184,7 @@ public class GuardController : Controller {
 	}
 
 	void UpdateAnim(){
-		anim.animSpeed = innerState.characteristics.speed / 10f;
+		anim.animSpeed = innerState.characteristics.speed / 20f;
 		anim.rotController = fov.transform;
 		anim.isMoving = isMoving;
 		anim.UpdateAnimator ();

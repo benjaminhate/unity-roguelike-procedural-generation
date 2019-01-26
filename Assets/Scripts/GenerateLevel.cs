@@ -8,6 +8,9 @@ public class GenerateLevel : MonoBehaviour {
     public int height = 50, width = 50;
     public GameObject corridor_tile, room_tile, door_tile, wall_tile;
 
+	public GameObject guardPrefab;
+	private int guardNum = 5;
+
 	// Use this for initialization
 	void Start () {
         Dungeon dungeon = new Dungeon((uint)height, (uint)width);
@@ -62,11 +65,30 @@ public class GenerateLevel : MonoBehaviour {
                     Instantiate(room_tile, tile_size * new Vector3(i, j, 0), Quaternion.identity);
             }
         }
+
+		InstantiateGuards (dungeon);
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	void InstantiateGuards(Dungeon dungeon){
+		Debug.Log ("Create Guards");
+		for (int i = 0; i < guardNum; i++) {
+			StartingState state = (StartingState)Random.Range (0, 3);
+			float idle = Random.value * Random.Range (0, 5);
+			Characteristics chara = Characteristics.random ();
+			Corridor corridor = dungeon.corridors [Random.Range (0, dungeon.corridors.Count)];
+			GameObject guard = Instantiate (guardPrefab, tile_size * new Vector3 (corridor.start.x, corridor.start.y, 0), Quaternion.identity);
+			GuardController guardController = guard.GetComponent<GuardController> ();
+			guardController.startingState = state;
+			guardController.idleDuration = idle;
+			guardController.innerState.characteristics = chara;
+			if (state == StartingState.Patrol) {
+				GuardBuildWaypoints (guardController);
+			}
+		}
+	}
+
+	void GuardBuildWaypoints(GuardController guard){
+
 	}
 
     void InstantiateCorridors(List<Corridor> corridors)

@@ -340,10 +340,18 @@ public class Dungeon
 
     public bool IsFree(Vector2Int coord) // Costly
     {
-        foreach (Corridor corridor in this.corridors)
-            if (corridor.IsIn(coord)) return false;
+		foreach (Corridor corridor in this.corridors)
+			if (corridor.IsIn (coord))
+				return false;
         return true;
     }
+
+	public Corridor GetCorridorFromCoord(Vector2Int coord){
+		foreach (Corridor corridor in corridors)
+			if (corridor.IsIn (coord))
+				return corridor;
+		return null;
+	}
 
     public Vector2Int MoveForward(Vector2Int coord, Direction dir)
     {
