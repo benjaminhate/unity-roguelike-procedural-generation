@@ -99,8 +99,12 @@ public class PlayerController : Controller {
 				float amount = Time.deltaTime * innerState.characteristics.absorbForce / other.GetComponent<Controller> ().innerState.characteristics.absorbForce;
 				other.GetComponent<AbsorbBar> ().AddAmount (amount);
 				// When it is at max, we can absorb with the Key E
-				if (other.GetComponent<AbsorbBar> ().IsMaxAmount () && Input.GetKey (KeyCode.E)) {
-					Debug.Log ("ABSORBED");
+				if (other.GetComponent<AbsorbBar> ().IsMaxAmount () && Input.GetKey (KeyCode.E))
+                {
+                    other.GetComponent<Animator>().Play("Absorption_animation");
+                    //TODO time for animation
+                    //yield ;
+                    Debug.Log ("ABSORBED");
 					other.GetComponent<AbsorbBar> ().Destroy ();
 					Absorbtion (other.gameObject);
 					Destroy (other.gameObject);
@@ -118,8 +122,9 @@ public class PlayerController : Controller {
 
 	void Absorbtion(GameObject enemy){
 		// Save the state if we have not absorbed yet (used to return to previous state when timer is over)
-		if (!absorbed) {
-			savedController = SaveController ();
+		if (!absorbed)
+        {
+            savedController = SaveController ();
 			absorbed = true;
 		}
 		timeAbsorbed = Time.time;

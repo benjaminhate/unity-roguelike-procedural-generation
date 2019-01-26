@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GuardAnimations : MonoBehaviour {
-
+    
     public Animator animator;
 
     private State current_state;
     private GuardController controller;
+    private bool facingRight = true;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         controller = GetComponent<GuardController>();
         animator.SetBool("isIdle",true);
         current_state = controller.GetState();
@@ -25,6 +26,11 @@ public class GuardAnimations : MonoBehaviour {
             current_state = controller.GetState();
             SetAnimation(current_state);
         }
+        float h = Input.GetAxis("Horizontal");
+        if (h > 0 && !facingRight)
+            Flip();
+        else if (h < 0 && facingRight)
+            Flip();
 
     }
 
@@ -64,5 +70,13 @@ public class GuardAnimations : MonoBehaviour {
         }
         //Absorbtion ? Doit être enclenché par le joueur
 
+    }
+
+    void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
     }
 }
