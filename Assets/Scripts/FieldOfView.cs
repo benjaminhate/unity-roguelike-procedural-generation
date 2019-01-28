@@ -17,12 +17,22 @@ public struct ViewCastInfo{
 	}
 }
 
+public struct PointInfo{
+	public Vector3 pos;
+	public float angle;
+
+	public PointInfo(Vector3 _pos, float _angle){
+		pos = _pos;
+		angle = _angle;
+	}
+}
+
 // Structure to store the infos for the FindEdge method
 public struct EdgeInfo{
-	public Vector3 pointA;
-	public Vector3 pointB;
+	public PointInfo pointA;
+	public PointInfo pointB;
 
-	public EdgeInfo(Vector3 _pointA, Vector3 _pointB) {
+	public EdgeInfo(PointInfo _pointA, PointInfo _pointB) {
 		pointA = _pointA;
 		pointB = _pointB;
 	}
@@ -101,14 +111,14 @@ public class FieldOfView : MonoBehaviour {
 		int stepCount = Mathf.RoundToInt(viewAngle * meshResolution);
 		float stepAngleSize = viewAngle / stepCount;
 
-		List<Vector3> viewPoints = new List<Vector3> ();
+		List<PointInfo> viewPoints = new List<PointInfo> ();
 		ViewCastInfo oldViewCast = new ViewCastInfo ();
 
 		// throw raycasts within the fov
 		for (int i = 0; i <= stepCount; i++) {
 			float angle = transform.eulerAngles.z - viewAngle / 2 + stepAngleSize * i;
 			ViewCastInfo newViewCast = ViewCast(angle);
-			Debug.DrawLine (transform.position, transform.position + DirFromAngle (angle, true) * newViewCast.dist, Color.red);
+			//Debug.DrawLine (transform.position, transform.position + DirFromAngle (angle, true) * newViewCast.dist, Color.red);
 
 			// when the oldViewCast is set
 			if (i > 0) {
@@ -116,16 +126,16 @@ public class FieldOfView : MonoBehaviour {
 				// Dichotomical method to find the edges of walls for better draw fov
 				if (oldViewCast.hit != newViewCast.hit || (oldViewCast.hit && newViewCast.hit && edgeDistThresholdExceeded)) {
 					EdgeInfo edge = FindEdge (oldViewCast, newViewCast);
-					if (edge.pointA != Vector3.zero) {
+					if (edge.pointA.pos != Vector3.zero) {
 						viewPoints.Add (edge.pointA);
 					}
-					if (edge.pointB != Vector3.zero) {
+					if (edge.pointB.pos != Vector3.zero) {
 						viewPoints.Add (edge.pointB);
 					}
 				}
 			}
 
-			viewPoints.Add (newViewCast.point);
+			viewPoints.Add (new PointInfo (newViewCast.point, newViewCast.angle));
 			oldViewCast = newViewCast;
 		}
 
@@ -138,7 +148,21 @@ public class FieldOfView : MonoBehaviour {
 		// The vertices are in local space
 		vertices [0] = Vector3.zero;
 		for (int i = 0; i < vertexCount - 1; i++) {
-			vertices [i + 1] = transform.InverseTransformPoint (viewPoints [i]);
+			float angle = viewPoints [i].angle;
+			if (angle <= 0)
+				angle += 360;
+			if (angle > 360)
+				angle -= 360;
+			Vector3 angleVector = Vector3.zero;
+			if (angle > 90 && angle <= 270)
+				angleVector.y = -1;
+			else
+				angleVector.y = 1;
+			if (angle > 180 && angle <= 360)
+				angleVector.x = 1;
+			else
+				angleVector.x = -1;
+			vertices [i + 1] = transform.InverseTransformPoint (viewPoints [i].pos + angleVector * maskCutaway);
 
 			if (i < vertexCount - 2) {
 				triangles [i * 3] = i + 2;
@@ -176,7 +200,7 @@ public class FieldOfView : MonoBehaviour {
 			}
 		}
 
-		return new EdgeInfo (minPoint, maxPoint);
+		return new EdgeInfo (new PointInfo (minPoint, minAngle), new PointInfo (maxPoint, maxAngle));
 	}
 
 	// Throw raycast at angle and return the infos

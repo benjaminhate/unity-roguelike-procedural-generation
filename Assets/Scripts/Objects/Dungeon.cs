@@ -25,14 +25,21 @@ public class Dungeon
 
         /* 2D array representing the level */
         Floor f = new Floor(height, width);
-        this.floor = f.GetFloor(); 
+        this.floor = f.GetFloor();
+
+		for (uint i = 0; i < width; i++) {
+			for (uint j = 0; j < height; j++) {
+				if (floor [i, j] == 1)
+					Debug.Log ("Floor [" + i + "," + j + "] : " + floor [i, j]);
+			}
+		}
 
         /* Corridors */
-        AddCorridors(floor);
+		AddCorridors (floor);
 
         /* Rooms */
-        AddRooms(floor, f.GetNumberOfRooms());
-        SortRoomsCorners();
+		AddRooms (floor, f.GetNumberOfRooms ());
+		SortRoomsCorners ();
     }
 
     /* Main functions */
@@ -70,7 +77,7 @@ public class Dungeon
                         corridor.length += 1;
                         i += 1;
                     }
-                    if (floor[i + 1, j - 1] == 1 && floor[i + 2, j] == 0 && floor[i + 1, j + 1] == 0) corridor.length++;
+                    //if (floor[i + 1, j - 1] == 1 && floor[i + 2, j] == 0 && floor[i + 1, j + 1] == 0) corridor.length++;
                     corridors.Add(corridor);
                 }
             }

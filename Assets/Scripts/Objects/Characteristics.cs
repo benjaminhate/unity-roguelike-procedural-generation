@@ -16,8 +16,8 @@ public class Characteristics {
 
 	public static Characteristics random(){
 		return new Characteristics (
-			Random.value * Random.Range (0, 10),
-			Random.value * Random.Range (0, 5),
-			Random.value * Random.Range (0, 5));
+			Random.value * Random.Range (1, 10) + 2f,
+			Random.value * Random.Range (1, 5) + 1f,
+			Random.value * Random.Range (1, 5) + 1f);
 	}
 }

@@ -1,19 +1,33 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GenerateLevel : MonoBehaviour {
     /* Parameters */
     public uint tile_size;
     public int height = 50, width = 50;
+	private float base_size = 3.2f;
     public GameObject corridor_tile, room_tile, door_tile, wall_tile;
 
 	public GameObject guardPrefab;
-	private int guardNum = 5;
+	public Canvas canvas;
+	public GameObject endText;
+	public GameObject guardAbsorbBar;
+	[Range(0,1)]
+	public float difficulty = 0.1f;
+
+	public GameObject endPrefab;
+	public GameObject playerPrefab;
+	public GameObject staminaBarPrefab;
 
 	// Use this for initialization
 	void Start () {
-        Dungeon dungeon = new Dungeon((uint)height, (uint)width);
+		Dungeon dungeon;
+		do {
+			dungeon = new Dungeon ((uint)height, (uint)width);
+		} while(dungeon.corridors.Count > difficulty * 30f || dungeon.corridors.Count < 2
+		        || dungeon.rooms.Count < 2 || dungeon.rooms.Count > difficulty * 20f);
 
         // Removing non squared rooms
         Room[] rooms = new Room[dungeon.rooms.Count];
@@ -36,59 +50,126 @@ public class GenerateLevel : MonoBehaviour {
         {
             // j == 0
             if (dungeon.floor[i - 1, 0] != 0 || dungeon.floor[i + 1, 0] != 0 || dungeon.floor[i, 1] != 0)
-                Instantiate(wall_tile, tile_size * new Vector3(i, 0, 0), Quaternion.identity);
+                InstantiateTile(wall_tile, tile_size, new Vector3(i, 0, 0), Quaternion.identity);
             // j == height - 1
             if (dungeon.floor[i - 1, height - 1] != 0 || dungeon.floor[i + 1, height - 1] != 0 || dungeon.floor[i, height - 2] != 0)
-                Instantiate(wall_tile, tile_size * new Vector3(i, height - 1, 0), Quaternion.identity);
+                InstantiateTile(wall_tile, tile_size, new Vector3(i, height - 1, 0), Quaternion.identity);
         }
         for (int j = 1; j < height - 1; j++)
         {
             // i == 0
             if (dungeon.floor[0, j + 1] != 0 || dungeon.floor[0, j - 1] != 0 || dungeon.floor[1, j] != 0)
-                Instantiate(wall_tile, tile_size * new Vector3(0, j, 0), Quaternion.identity);
+                InstantiateTile(wall_tile, tile_size, new Vector3(0, j, 0), Quaternion.identity);
             // i == width - 1
             if (dungeon.floor[width - 1, j + 1] != 0 || dungeon.floor[width - 1, j + 1] != 0 || dungeon.floor[width - 2, j] != 0)
-                Instantiate(wall_tile, tile_size * new Vector3(width - 1, j, 0), Quaternion.identity);
-        }   
+                InstantiateTile(wall_tile, tile_size, new Vector3(width - 1, j, 0), Quaternion.identity);
+        }
 
         for (int i = 1; i < width - 1; i++)
         {
             for (int j = 1; j < height - 1; j++)
             {
-                if (dungeon.floor[i, j] == 0 && (dungeon.floor[i + 1, j] != 0 || dungeon.floor[i - 1, j] != 0 || dungeon.floor[i, j + 1] != 0 || dungeon.floor[i, j - 1] != 0))
-                    Instantiate(wall_tile, tile_size * new Vector3(i, j, 0), Quaternion.identity);
+				if (dungeon.floor [i, j] == 0 && (dungeon.floor [i + 1, j] != 0 || dungeon.floor [i - 1, j] != 0 || dungeon.floor [i, j + 1] != 0 || dungeon.floor [i, j - 1] != 0))
+					InstantiateTile(wall_tile, tile_size, new Vector3(i, j, 0), Quaternion.identity);
                 else if (dungeon.floor[i, j] == 1)
-                    Instantiate(corridor_tile, tile_size * new Vector3(i, j, 0), Quaternion.identity);
+                    InstantiateTile(corridor_tile, tile_size, new Vector3(i, j, 0), Quaternion.identity);
                 else if (dungeon.floor[i, j] == 2)
-                    Instantiate(door_tile, tile_size * new Vector3(i, j, 0), Quaternion.identity);
+                    InstantiateTile(door_tile, tile_size, new Vector3(i, j, 0), Quaternion.identity);
                 else if (dungeon.floor[i, j] > 2)
-                    Instantiate(room_tile, tile_size * new Vector3(i, j, 0), Quaternion.identity);
+                    InstantiateTile(room_tile, tile_size, new Vector3(i, j, 0), Quaternion.identity);
             }
         }
 
 		InstantiateGuards (dungeon);
+		SpawnPlayerAndEnd (dungeon);
     }
 
+	void InstantiateTile(GameObject prefab, uint size, Vector3 position, Quaternion rotation){
+		GameObject tile = Instantiate (prefab, size * position, rotation);
+		tile.transform.localScale = new Vector3 (
+			(tile.transform.localScale.x * size) / base_size,
+			(tile.transform.localScale.y * size) / base_size,
+			(tile.transform.localScale.z * size) / base_size
+		);
+	}
+
 	void InstantiateGuards(Dungeon dungeon){
-		Debug.Log ("Create Guards");
+		RandomIndexPicker<Corridor> corridorPicker = new RandomIndexPicker<Corridor> (dungeon.corridors);
+		int guardNum = Mathf.FloorToInt (difficulty * 5f * corridorPicker.Count ());
 		for (int i = 0; i < guardNum; i++) {
-			StartingState state = (StartingState)Random.Range (0, 3);
-			float idle = Random.value * Random.Range (0, 5);
+			if (corridorPicker.IsEmpty ())
+				break;
+			
+			// Generate random values
+			//int randomState = Random.Range (0, 10);
+			int randomState = 0;
+			if (randomState > 2)
+				randomState = 0;
+			StartingState state = (StartingState)randomState;
+			float idle = Random.value * Random.Range (1, 5) + 1f;
 			Characteristics chara = Characteristics.random ();
-			Corridor corridor = dungeon.corridors [Random.Range (0, dungeon.corridors.Count)];
+			Corridor corridor = corridorPicker.Pick ();
+			Debug.Log (corridor.start + ";" + corridor.length + ";" + corridor.dir);
+
+			// Instantiate guard
 			GameObject guard = Instantiate (guardPrefab, tile_size * new Vector3 (corridor.start.x, corridor.start.y, 0), Quaternion.identity);
+
+			// Edit guardController values
 			GuardController guardController = guard.GetComponent<GuardController> ();
 			guardController.startingState = state;
 			guardController.idleDuration = idle;
 			guardController.innerState.characteristics = chara;
+
+			// Patroling state
 			if (state == StartingState.Patrol) {
-				GuardBuildWaypoints (guardController);
+				GuardBuildWaypoints (dungeon, guardController, corridor, tile_size);
 			}
+
+			// Absorb bar
+			GameObject absorbBar = Instantiate (guardAbsorbBar, canvas.transform);
+			AbsorbBar absorbScript = guard.GetComponent<AbsorbBar> ();
+			absorbScript.bar = absorbBar.GetComponent<RectTransform> ();
+			absorbScript.targetCanvas = canvas.GetComponent<RectTransform> ();
+			absorbScript.maxAmout = 1;
 		}
 	}
 
-	void GuardBuildWaypoints(GuardController guard){
+	void GuardBuildWaypoints(Dungeon dungeon, GuardController guard, Corridor startCorridor, float size){
+		guard.waypoints.Clear ();
+		Vector2 start = size * new Vector2 (startCorridor.start.x, startCorridor.start.y);
+		Vector2 next = start;
+		guard.waypoints.Add (new Waypoint (next));
+		Vector2Int nextPos = startCorridor.Forward (startCorridor.start, (int)(startCorridor.length - 1));
+		//Corridor nextCorridor = dungeon.GetCorridorFromCoord (nextPos);
+		//if (nextCorridor != null) {
+		next = size * new Vector2 (nextPos.x, nextPos.y);
+		guard.waypoints.Add (new Waypoint (next));
+		//}
+	}
 
+	void SpawnPlayerAndEnd(Dungeon dungeon){
+		RandomIndexPicker<Room> roomPicker = new RandomIndexPicker<Room> (dungeon.rooms);
+		Room startRoom = roomPicker.Pick ();
+		Vector2 playerPos = startRoom.GetCenter ();
+		SpawnPlayer (playerPos);
+		Room endRoom = roomPicker.Pick ();
+		Vector2 endPos = endRoom.GetCenter ();
+		SpawnEnd (endPos);
+	}
+
+	void SpawnPlayer(Vector2 position){
+		GameObject player = Instantiate (playerPrefab, tile_size * position, Quaternion.identity);
+		GameObject mainCamera = Camera.main.gameObject;
+		mainCamera.AddComponent<MainCameraController> ();
+		mainCamera.GetComponent<MainCameraController> ().target = player;
+		GameObject staminaBar = Instantiate (staminaBarPrefab, canvas.transform);
+		player.GetComponent<PlayerController> ().staminaBar = staminaBar.GetComponent<RectTransform> ();
+		player.GetComponent<PlayerController> ().staminaDrain = difficulty * 20f;
+	}
+
+	void SpawnEnd(Vector2 position){
+		GameObject end = Instantiate (endPrefab, tile_size * position, Quaternion.identity);
+		end.GetComponent<Finish> ().endText = endText;
 	}
 
     void InstantiateCorridors(List<Corridor> corridors)

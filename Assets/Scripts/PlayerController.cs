@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 [RequireComponent(typeof (Rigidbody2D))]
 public class PlayerController : Controller {
@@ -11,6 +13,7 @@ public class PlayerController : Controller {
 	public float maxStamina;
 	[SerializeField]
 	private float stamina;
+	public RectTransform staminaBar;
 
 	private float moveHDelay = 0f;
 	private float moveVDelay = 0f;
@@ -24,6 +27,8 @@ public class PlayerController : Controller {
 	private bool absorbed = false;
 	private float timeAbsorbed = 0f;
 
+	private bool isDead = false;
+
 	void Awake(){
 		SaveCurrentState ();
 	}
@@ -33,13 +38,16 @@ public class PlayerController : Controller {
 		anim = GetComponent<AnimationController> ();
 		fov = GetComponentInChildren<FieldOfView> ();
 		UpdateController ();
-		rd2d = GetComponent<Rigidbody2D> ();
+		//rd2d = GetComponent<Rigidbody2D> ();
 	}
 
 	void FixedUpdate () {
-		Move ();
-		UpdateAbsorption ();
-		UpdateAnim ();
+		if (!isDead) {
+			Move ();
+			UpdateAbsorption ();
+			UpdateAnim ();
+			UpdateStamina ();
+		}
 	}
 
 	void Move(){
@@ -73,7 +81,7 @@ public class PlayerController : Controller {
 					stamina = 0;
 			}
 		} else if(stamina < maxStamina) {
-			stamina += staminaDrain * Time.deltaTime / 2f;
+			stamina += staminaDrain * Time.deltaTime;
 			if (stamina > maxStamina)
 				stamina = maxStamina;
 		}
@@ -81,33 +89,46 @@ public class PlayerController : Controller {
 		transform.Translate (innerState.characteristics.speed * speedRate * forward * Time.fixedDeltaTime);
 	}
 
-	void OnTriggerEnted2D(Collider2D other){
+	public void Death(){
+		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+	}
+
+	public void DeadAnimation(){
+		isDead = true;
+		StartCoroutine (anim.DeadAnimation (2f));
+	}
+
+	void OnTriggerEnter2D(Collider2D other){
 		// When we enter the enemy's absorption area
+		//Debug.Log("ENTER : "+ other.tag);
 		if (other.CompareTag ("Enemy")) {
-			other.GetComponent<AbsorbBar> ().SetAmount (0);
+			other.GetComponentInParent<AbsorbBar> ().SetAmount (0);
+		}
+		if (other.CompareTag ("Weapon") && !isDead) {
+			//Debug.Log ("TOUCHED BY WEAPON");
+			DeadAnimation();
 		}
 	}
 
 	void OnTriggerStay2D(Collider2D other){
-		Debug.Log ("Stay");
+		//Debug.Log ("Stay " + other.tag);
 		// When we stay in the enemy's absorption area
 		if (other.CompareTag ("Enemy")) {
 			// Controll the state the enemy is in
-			if (other.GetComponent<GuardController> ().EnableAbsorption ()) {
+			if (other.GetComponentInParent<GuardController> ().EnableAbsorption () && !isDead) {
 				// Add an amount to the percentage absorbed
 				// Each amount is stored within the enemy's AbsorbBar to ensure that each enemy has his own value
-				float amount = Time.deltaTime * innerState.characteristics.absorbForce / other.GetComponent<Controller> ().innerState.characteristics.absorbForce;
-				other.GetComponent<AbsorbBar> ().AddAmount (amount);
+				float amount = Time.deltaTime * innerState.characteristics.absorbForce / other.GetComponentInParent<Controller> ().innerState.characteristics.absorbForce;
+				other.GetComponentInParent<AbsorbBar> ().AddAmount (amount);
 				// When it is at max, we can absorb with the Key E
-				if (other.GetComponent<AbsorbBar> ().IsMaxAmount () && Input.GetKey (KeyCode.E))
+				if (other.GetComponentInParent<AbsorbBar> ().IsMaxAmount () && Input.GetKey (KeyCode.E))
                 {
-                    other.GetComponent<Animator>().Play("Absorption_animation");
                     //TODO time for animation
-                    //yield ;
-                    Debug.Log ("ABSORBED");
-					other.GetComponent<AbsorbBar> ().Destroy ();
-					Absorbtion (other.gameObject);
-					Destroy (other.gameObject);
+                    //Debug.Log ("ABSORBED");
+					other.GetComponentInParent<GuardController>().DeadAnimation();
+					other.GetComponentInParent<AbsorbBar> ().Destroy ();
+					Absorbtion (other.transform.parent.gameObject);
+					//Destroy (other.transform.parent.gameObject);
 				}
 			}
 		}
@@ -116,7 +137,7 @@ public class PlayerController : Controller {
 	void OnTriggerExit2D(Collider2D other){
 		// When we quit the enemy's absorption area
 		if (other.CompareTag ("Enemy")) {
-			other.GetComponent<AbsorbBar> ().SetAmount (0);
+			other.GetComponentInParent<AbsorbBar> ().SetAmount (0);
 		}
 	}
 
@@ -153,5 +174,9 @@ public class PlayerController : Controller {
 		anim.rotController = fov.transform;
 		anim.isMoving = isMoving;
 		anim.UpdateAnimator ();
+	}
+
+	void UpdateStamina(){
+		staminaBar.GetComponent<Image> ().fillAmount = stamina / maxStamina;
 	}
 }

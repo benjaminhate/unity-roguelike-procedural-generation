@@ -18,4 +18,18 @@ public class Room {
     {
         return true;
     }
+
+	public Vector2 GetCenter(){
+		return GetCentroid ();
+	}
+
+	public Vector2 GetCentroid()
+	{
+		Vector2 center = new Vector2(0f, 0f);
+		foreach (Vector2Int corner in corners)
+		{
+			center += corner;
+		}
+		return center / corners.Count;
+	}
 }

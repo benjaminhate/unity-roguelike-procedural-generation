@@ -27,23 +27,22 @@ public class Corridor {
         return false;
     }
 
-    public Vector2Int Forward(Vector2Int coord)
-    {
-        switch (this.dir)
-        {
-            case Direction.LEFT:
-                coord[0] -= 1;
-                break;
-            case Direction.UP:
-                coord[1] += 1;
-                break;
-            case Direction.RIGHT:
-                coord[0] += 1;
-                break;
-            case Direction.DOWN:
-                coord[1] -= 1;
-                break;
-        }
-        return coord;
-    }
+	public Vector2Int Forward(Vector2Int coord, int dist = 1)
+	{
+		switch (this.dir) {
+		case Direction.LEFT:
+			coord [0] -= dist;
+			break;
+		case Direction.UP:
+			coord [1] += dist;
+			break;
+		case Direction.RIGHT:
+			coord [0] += dist;
+			break;
+		case Direction.DOWN:
+			coord [1] -= dist;
+			break;
+		}
+		return coord;
+	}
 }

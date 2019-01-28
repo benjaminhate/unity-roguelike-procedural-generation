@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public enum StartingState{
 	Patrol = 0,
@@ -14,18 +13,19 @@ public enum State{
 	Sleep,
 	Idle,
 	Chase,
-	Monitor
+	Monitor,
+	Attack
 }
 
 public class GuardController : Controller {
 
 	public StartingState startingState;
-	public Waypoint[] waypoints;
+	public List<Waypoint> waypoints;
 	public float idleDuration;
 
 	private FieldOfView fov;
 	private int currentWaypointIndex = 0;
-	private Transform target;
+	private Vector3 targetPos;
 	private Vector3 monitorPos;
 	private bool idleFromMonitor;
 
@@ -38,14 +38,28 @@ public class GuardController : Controller {
 	private State state;
 	private bool isMoving;
 
+	private float attackDist = 3.8f;
+	private float waypointDist = .1f;
+
+	private bool isDead = false;
+
     public State GetState()
     {
         return state;
     }
 
+	public void Death(){
+		Destroy (gameObject);
+	}
+
+	public void DeadAnimation(){
+		isDead = true;
+		StartCoroutine (anim.DeadAnimation (2f));
+	}
+
     // Value used in PlayerController
     public bool EnableAbsorption(){
-		return state != State.Chase;
+		return state != State.Chase && state != State.Attack && !isDead;
 	}
 
 	void Awake(){
@@ -61,11 +75,10 @@ public class GuardController : Controller {
 	}
 	
 	void Update () {
-		Move ();
-		UpdateState ();
-		UpdateAnim ();
-		if (state == State.Chase && Vector2.Distance (target.position,transform.position) < 3f) {
-			SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+		if (!isDead) {
+			Move ();
+			UpdateState ();
+			UpdateAnim ();
 		}
 	}
 
@@ -75,7 +88,7 @@ public class GuardController : Controller {
 			MoveToWaypoint (waypoints [currentWaypointIndex]);
 		}
 		if (state == State.Chase) {
-			MoveToTarget (target.position);
+			MoveToChase ();
 		}
 		if (state == State.Monitor) {
 			MoveToMonitor ();
@@ -87,17 +100,27 @@ public class GuardController : Controller {
 				MoveAroundIdle ();
 			}
 		}
+		if (state == State.Attack) {
+			WaitForAttack ();
+		}
 	}
 
 	void UpdateState(){
 		if (fov.visibleTargets.Count > 0) {
 			Controller fovController = fov.visibleTargets [0].GetComponent<Controller> ();
-			if (state != State.Sleep && state != State.Chase && fovController.innerState.type == ControllerType.PLAYER) {
+			State[] states = {State.Sleep, State.Attack, State.Chase};
+			if (!StateIsInList (state, states) && fovController.innerState.type == ControllerType.PLAYER) {
 				ChangeState (State.Chase);
+			}
+			if (state == State.Chase) {
+				targetPos = fov.visibleTargets [0].position;
 			}
 		} else {
 			if (state == State.Chase) {
 				ChangeState (State.Monitor);
+			}
+			if (state == State.Attack) {
+				
 			}
 		}
 	}
@@ -105,14 +128,18 @@ public class GuardController : Controller {
 	void ChangeState(State s){
 		Debug.Log (s);
 		if (s == State.Chase) {
-			target = fov.visibleTargets [0];
+			if (fov.visibleTargets.Count > 0)
+				targetPos = fov.visibleTargets [0].position;
 		}
 		if (s == State.Monitor) {
-			monitorPos = target.position;
+			monitorPos = targetPos;
 		}
 		if (s == State.Idle) {
 			idleStart = Time.time;
 			initAngle = transform.eulerAngles.z;
+		}
+		if (s == State.Attack) {
+			anim.isAttackAnimated = true;
 		}
 		state = s;
     }
@@ -123,12 +150,22 @@ public class GuardController : Controller {
 		// Normalize the direction or else the guard will be faster if he is far away
 		Vector3 dir = (targetPos - currentPos).normalized;
 
-		transform.position += dir * innerState.characteristics.speed * Time.deltaTime / innerState.characteristics.decceleration;
+		transform.position += dir * innerState.characteristics.speed * Time.deltaTime;
 		// If the guard is moving
 		isMoving = dir != Vector3.zero;
 		if (isMoving) {
 			float angle = Mathf.Atan2 (dir.x, dir.y) * Mathf.Rad2Deg;
 			fov.transform.rotation = Quaternion.AngleAxis(angle,Vector3.back);
+		}
+	}
+
+	void MoveToChase(){
+		Vector3 currentPos = transform.position;
+
+		if (Vector3.Distance (currentPos, targetPos) < attackDist) {
+			ChangeState (State.Attack);
+		} else {
+			MoveToTarget (targetPos);
 		}
 	}
 		
@@ -137,7 +174,7 @@ public class GuardController : Controller {
 		Vector3 waypointPos = waypoint.position;
 
 		// Check if the guard is near the waypoint
-		if (Vector3.Distance (currentPos, waypointPos) < .1f) {
+		if (Vector3.Distance (currentPos, waypointPos) < waypointDist) {
 			NextWaypoint ();
 		} else {
 			MoveToTarget (waypoint.position);
@@ -146,13 +183,13 @@ public class GuardController : Controller {
 
 	// Change waypoint
 	void NextWaypoint(){
-		currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+		currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count;
 	}
 
 	void MoveToMonitor(){
 		Vector3 currentPos = transform.position;
 
-		if (Vector3.Distance (currentPos, monitorPos) < .1f) {
+		if (Vector3.Distance (currentPos, monitorPos) < waypointDist) {
 			idleFromMonitor = true;
 			ChangeState (State.Idle);
 		} else {
@@ -161,11 +198,11 @@ public class GuardController : Controller {
 	}
 
 	void MoveAroundIdle(){
-		float percent = (Time.time - idleStart) / idleDuration;
+		float percent = (Time.time - idleStart) / innerState.characteristics.speed;
 
 		if (percent > 1f) {
 			if (idleFromMonitor) {
-				ChangeState (State.Patrol);
+				ChangeState ((State)startingState);
 			} else {
 				idleStill = true;
 				idleStart = Time.time;
@@ -183,8 +220,34 @@ public class GuardController : Controller {
 		}
 	}
 
+	void WaitForAttack(){
+		Vector3 currentPos = transform.position;
+		if (!anim.isAttackAnimated) {
+			if (fov.visibleTargets.Count > 0) {
+				targetPos = fov.visibleTargets [0].position;
+				//Debug.Log (currentPos + ";" + targetPos);
+				if (Vector3.Distance (currentPos, targetPos) >= attackDist) {
+					ChangeState (State.Chase);
+				} else {
+					anim.isAttackAnimated = true;
+				}
+			} else {
+				ChangeState (State.Monitor);
+			}
+
+		}
+	}
+
+	bool StateIsInList(State state, State[] list){
+		for (int i = 0; i < list.Length; i++) {
+			if (list [i] == state)
+				return true;
+		}
+		return false;
+	}
+
 	void UpdateAnim(){
-		anim.animSpeed = innerState.characteristics.speed / 20f;
+		anim.animSpeed = Mathf.Sqrt (innerState.characteristics.speed) / 10f;
 		anim.rotController = fov.transform;
 		anim.isMoving = isMoving;
 		anim.UpdateAnimator ();

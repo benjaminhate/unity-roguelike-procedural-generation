@@ -29,7 +29,9 @@ public class AbsorbBar : MonoBehaviour {
 
 	// Fill the bar with the percentage of amount
 	public void OnDataChanged(){
-		bar.GetComponent<Image> ().fillAmount = amount / maxAmout;
+		if (bar != null) {
+			bar.GetComponent<Image> ().fillAmount = amount / maxAmout;
+		}
 	}
 
 	public void AddAmount(float addAmount){
@@ -61,11 +63,13 @@ public class AbsorbBar : MonoBehaviour {
 
 	// Place the bar on the target's position
 	private void RepositionBar(){
-		Vector2 ViewportPosition = Camera.main.WorldToViewportPoint (targetFollow.position);
-		Vector2 WorldObject_ScreenPosition = new Vector2 (
-			((ViewportPosition.x * targetCanvas.sizeDelta.x) - (targetCanvas.sizeDelta.x * 0.5f)) + positionCorrection.x,
-			((ViewportPosition.y * targetCanvas.sizeDelta.y) - (targetCanvas.sizeDelta.y * 0.5f)) + positionCorrection.y
-		);
-		bar.anchoredPosition = WorldObject_ScreenPosition;
+		if (bar != null) {
+			Vector2 ViewportPosition = Camera.main.WorldToViewportPoint (targetFollow.position);
+			Vector2 WorldObject_ScreenPosition = new Vector2 (
+				((ViewportPosition.x * targetCanvas.sizeDelta.x) - (targetCanvas.sizeDelta.x * 0.5f)) + positionCorrection.x,
+				((ViewportPosition.y * targetCanvas.sizeDelta.y) - (targetCanvas.sizeDelta.y * 0.5f)) + positionCorrection.y
+			);
+			bar.anchoredPosition = WorldObject_ScreenPosition;
+		}
 	}
 }

@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class DisableOnPlay : MonoBehaviour {
 
+	public bool disable;
+
 	void Awake(){
-		gameObject.SetActive (false);
+		gameObject.SetActive (!disable);
 	}
 }

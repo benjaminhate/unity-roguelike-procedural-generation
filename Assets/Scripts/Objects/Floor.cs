@@ -70,6 +70,8 @@ public class Floor
             {
                 if (floor[i, j] <= 1) continue;
                 uint[] labels = GetCloseNeighboursLabels(new Vector2Int(i, j));
+				if (labels.Length == 0)
+					break;
                 /* Only Left and Bottom neighbours matter */
                 if (labels[(int)Direction.LEFT] <= 2 && labels[(int)Direction.DOWN] <= 2)
                 {
@@ -105,12 +107,13 @@ public class Floor
 
         /* INFO : Number of rooms : label - 3 */
         // Compute each room's surface
-        uint[] room_surfaces = new uint[label - 3];
+		uint[] room_surfaces = new uint[label - 3 + 1];
         for (int i = 1; i < width - 1; i++)
         {
             for (int j = 1; j < height - 1; j++)
             {
-                if (floor[i, j] > 2) room_surfaces[floor[i, j] - 3] += 1;
+				if (floor [i, j] > 2 && floor [i, j] - 3 < room_surfaces.Length)
+					room_surfaces [floor [i, j] - 3] += 1;
             }
         }
 
@@ -120,7 +123,10 @@ public class Floor
         {
             for (int j = 1; j < height - 1; j++)
             {
-                if (floor[i, j] > 2 && room_surfaces[floor[i, j] - 3] < Mathf.Min(width, height) / 2.0f) floor[i, j] = 0;
+				if (floor [i, j] > 2 && floor [i, j] - 3 < room_surfaces.Length)
+				if (room_surfaces [floor [i, j] - 3] < Mathf.Min (width, height) / 2.0f
+				    || room_surfaces [floor [i, j] - 3] > Mathf.Max (width, height) * 2.0f)
+					floor [i, j] = 0;
             }
         }
 
@@ -131,7 +137,7 @@ public class Floor
         }
 
         // Compute each room wall's length (only tiles next to corridor)
-        uint[] wall_surfaces = new uint[label - 3];
+		uint[] wall_surfaces = new uint[label - 3 + 1];
         for (int i = 1; i < width - 1; i++)
         {
             for (int j = 1; j < height - 1; j++)
@@ -139,6 +145,8 @@ public class Floor
                 if (floor[i, j] == 0)
                 {
                     uint[] labels = GetCloseNeighboursLabels(new Vector2Int(i, j));
+					if (labels.Length == 0)
+						break;
                     if (labels[(int)Direction.LEFT] > 2)
                     {
                         wall_surfaces[labels[(int)Direction.LEFT] - 3] += 1;
@@ -170,6 +178,8 @@ public class Floor
                 if (floor[i, j] == 0 && !IsWallCorner(new Vector2Int(i, j)))
                 {
                     uint[] labels = GetCloseNeighboursLabels(new Vector2Int(i, j));
+					if (labels.Length == 0)
+						break;
                     /* Probability should depend on wall's length, and a door should be added in all cases */
                     if (labels[(int)Direction.LEFT] > 2 && !door_created_labels[labels[(int)Direction.LEFT] - 3])
                     {
@@ -219,34 +229,39 @@ public class Floor
             {
                 if (IsDeadEnd(new Vector2Int(i, j)))
                 {
-                    if (GetCloseNeighboursLabels(new Vector2Int(i, j))[0] == 1) // Left is free
+					uint[] labels = GetCloseNeighboursLabels (new Vector2Int (i, j));
+                    if (labels[0] == 1) // Left is free
                     {
-                        int k = i;
-                        while (GetCloseNeighboursLabels(new Vector2Int(k, j))[1] == 0 && GetCloseNeighboursLabels(new Vector2Int(k, j))[3] == 0 && k > 1)
-                        {
-                            floor[k, j] = 0;
-                            k -= 1;
-                        }
+                        /*int k = i;
+						uint[] internLabels = GetCloseNeighboursLabels (new Vector2Int (k, j));
+						while (internLabels.Length > 0 && internLabels [1] == 0 && internLabels [3] == 0 && k > 1) {
+							floor [k, j] = 0;
+							k -= 1;
+							internLabels = GetCloseNeighboursLabels (new Vector2Int (k, j));
+						}*/
+						FillDeadEnd (new Vector2Int (i, j), -1, 1, true, 1);
                     }
-                    else if (GetCloseNeighboursLabels(new Vector2Int(i, j))[2] == 1) // Right is free
+					else if (labels[2] == 1) // Right is free
                     {
-                        int k = i;
+                        /*int k = i;
                         while (GetCloseNeighboursLabels(new Vector2Int(k, j))[1] == 0 && GetCloseNeighboursLabels(new Vector2Int(k, j))[3] == 0 && k < width - 1)
                         {
                             floor[k, j] = 0;
                             k += 1;
-                        }
+                        }*/
+						FillDeadEnd (new Vector2Int (i, j), 1, 1, false, (int)width - 1);
                     }
-                    else if (GetCloseNeighboursLabels(new Vector2Int(i, j))[1] == 1) // Top is free
+					else if (labels[1] == 1) // Top is free
                     {
-                        int l = j;
+                        /*int l = j;
                         while (GetCloseNeighboursLabels(new Vector2Int(i, l))[0] == 0 && GetCloseNeighboursLabels(new Vector2Int(i, l))[2] == 0 && l < height - 1)
                         {
                             floor[i, l] = 0;
                             l += 1;
-                        }
+                        }*/
+						FillDeadEnd (new Vector2Int (i, j), 1, 0, false, (int)height - 1);
                     }
-                    else if (GetCloseNeighboursLabels(new Vector2Int(i, j))[3] == 1) // Bottom is free
+					else if (labels[3] == 1) // Bottom is free
                     {
                         int l = j;
                         while (GetCloseNeighboursLabels(new Vector2Int(i, l))[0] == 0 && GetCloseNeighboursLabels(new Vector2Int(i, l))[2] == 0 && l > 1)
@@ -254,11 +269,22 @@ public class Floor
                             floor[i, l] = 0;
                             l -= 1;
                         }
+						FillDeadEnd (new Vector2Int (i, j), -1, 0, true, 1);
                     }
                 }
             }
         }
     }
+
+	void FillDeadEnd(Vector2Int start, int addVal, int indexModif, bool sup, int supVal){
+		uint[] internLabels = GetCloseNeighboursLabels (start);
+		while (internLabels.Length > 0 && internLabels [indexModif] == 0 && internLabels [indexModif + 2] == 0
+		       && ((sup && start [1 - indexModif] > supVal) || (!sup && start [1 - indexModif] < supVal))) {
+			floor [start.x, start.y] = 0;
+			start [1 - indexModif] += addVal;
+			internLabels = GetCloseNeighboursLabels (start);
+		}
+	}
 
     /* Useful auxiliary functions */
 
@@ -446,11 +472,14 @@ public class Floor
     {
         if (floor[coord[0], coord[1]] != 1) return false; // Only a corridor can be a dead-end
         uint[] labels = GetCloseNeighboursLabels(coord);
-        if (labels[0] == 0 && labels[1] == 0 && labels[3] == 0) return true; // Left dead-end
-        else if (labels[0] == 0 && labels[1] == 0 && labels[2] == 0) return true; // Top dead-end
-        else if (labels[1] == 0 && labels[2] == 0 && labels[3] == 0) return true; // Right dead-end
-        else if (labels[0] == 0 && labels[3] == 0 && labels[2] == 0) return true; // Bottom dead-end
-        else return false;
+		if (labels.Length == 0)
+			return false;
+		else if (labels [0] == 0 && labels [1] == 0 && labels [3] == 0)
+			return true; // Left dead-end
+		else if (labels[0] == 0 && labels[1] == 0 && labels[2] == 0) return true; // Top dead-end
+		else if (labels[1] == 0 && labels[2] == 0 && labels[3] == 0) return true; // Right dead-end
+		else if (labels[0] == 0 && labels[3] == 0 && labels[2] == 0) return true; // Bottom dead-end
+		else return false;
     }
 
     public Vector2Int[] GetNeighbours(Vector2Int coord)

@@ -20,7 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4454777338458364}
   - component: {fileID: 114369347011045516}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: FOV
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 4306121721393016}
   - component: {fileID: 33924775923165150}
   - component: {fileID: 23485293018828508}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: View Visualisation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53,12 +53,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4976441676807400}
   - component: {fileID: 212077352836623172}
-  - component: {fileID: 50679097972741160}
   - component: {fileID: 114141749961123000}
-  - component: {fileID: 95435855867569954}
-  - component: {fileID: 114633736013864888}
   - component: {fileID: 60194835954660448}
-  m_Layer: 0
+  - component: {fileID: 50136869416933452}
+  - component: {fileID: 95378398341333334}
+  - component: {fileID: 114908700783641004}
+  m_Layer: 10
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1483662909347292}
   m_Mesh: {fileID: 0}
---- !u!50 &50679097972741160
+--- !u!50 &50136869416933452
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 1
@@ -165,7 +165,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!60 &60194835954660448
 PolygonCollider2D:
@@ -201,7 +201,7 @@ PolygonCollider2D:
       - {x: 1.6, y: -0.90000004}
       - {x: 1.6, y: -0.1}
       - {x: 1.4, y: 0.90000004}
---- !u!95 &95435855867569954
+--- !u!95 &95378398341333334
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 1
@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78df117f926ca4347b42115583efa228, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewRadius: 15
+  viewRadius: 20
   viewAngle: 360
   targetTag: Enemy
   obstacleMask:
@@ -264,11 +264,11 @@ MonoBehaviour:
   visibleTargets: []
   drawFov: 1
   meshResolution: 0.5
-  maskCutaway: 0.15
+  maskCutaway: 0.5
   edgeResolveIterations: 4
   edgeDistThreshold: 0.5
   viewMeshFilter: {fileID: 33924775923165150}
---- !u!114 &114633736013864888
+--- !u!114 &114908700783641004
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -280,8 +280,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  isAGuard: 0
   rotController: {fileID: 0}
-  animSpeed: 0
+  animSpeed: 2
+  isAttackAnimated: 0
 --- !u!212 &212077352836623172
 SpriteRenderer:
   m_ObjectHideFlags: 1
