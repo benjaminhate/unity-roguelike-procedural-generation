@@ -126,7 +126,7 @@ public class GuardController : Controller {
 	}
 
 	void ChangeState(State s){
-		Debug.Log (s);
+		//Debug.Log (s);
 		if (s == State.Chase) {
 			if (fov.visibleTargets.Count > 0)
 				targetPos = fov.visibleTargets [0].position;
@@ -144,13 +144,17 @@ public class GuardController : Controller {
 		state = s;
     }
 
-	void MoveToTarget(Vector3 targetPos){
+	void MoveToTarget(Vector3 targetPos, bool isSprinting = false){
 		Vector3 currentPos = transform.position;
 
 		// Normalize the direction or else the guard will be faster if he is far away
 		Vector3 dir = (targetPos - currentPos).normalized;
 
-		transform.position += dir * innerState.characteristics.speed * Time.deltaTime;
+		float speed = innerState.characteristics.speed;
+		if (isSprinting)
+			speed *= 1.5f;
+
+		transform.position += dir * speed * Time.deltaTime;
 		// If the guard is moving
 		isMoving = dir != Vector3.zero;
 		if (isMoving) {
@@ -165,7 +169,7 @@ public class GuardController : Controller {
 		if (Vector3.Distance (currentPos, targetPos) < attackDist) {
 			ChangeState (State.Attack);
 		} else {
-			MoveToTarget (targetPos);
+			MoveToTarget (targetPos, true);
 		}
 	}
 		

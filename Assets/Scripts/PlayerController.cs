@@ -90,7 +90,10 @@ public class PlayerController : Controller {
 	}
 
 	public void Death(){
-		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+		GameObject dungeonGenerator = GameObject.Find ("DungeonGenerator");
+		dungeonGenerator.GetComponent<GenerateLevel> ().ResetDungeonVoid ();
+		//StartCoroutine (dungeonGenerator.GetComponent<GenerateLevel> ().ResetDungeon ());
+		//SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
 	}
 
 	public void DeadAnimation(){

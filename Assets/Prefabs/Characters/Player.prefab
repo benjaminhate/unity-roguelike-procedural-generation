@@ -231,12 +231,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   innerState:
     characteristics:
-      speed: 5
-      decceleration: 1.5
-      absorbForce: 1
+      speed: 7
+      decceleration: 2
+      absorbForce: 2
     type: 0
     spriteManager:
-      sprite: {fileID: 0}
       color: {r: 0, g: 0, b: 0, a: 0}
       scale: {x: 0, y: 0, z: 0}
       anim: {fileID: 0}
@@ -244,6 +243,7 @@ MonoBehaviour:
   staminaDrain: 5
   maxStamina: 10
   stamina: 0
+  staminaBar: {fileID: 0}
 --- !u!114 &114369347011045516
 MonoBehaviour:
   m_ObjectHideFlags: 1

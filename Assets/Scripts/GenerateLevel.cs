@@ -12,7 +12,7 @@ public class GenerateLevel : MonoBehaviour {
 
 	public GameObject guardPrefab;
 	public Canvas canvas;
-	public GameObject endText;
+	public GameObject endTextPrefab;
 	public GameObject guardAbsorbBar;
 	[Range(0,1)]
 	public float difficulty = 0.1f;
@@ -21,9 +21,54 @@ public class GenerateLevel : MonoBehaviour {
 	public GameObject playerPrefab;
 	public GameObject staminaBarPrefab;
 
+	private Dungeon dungeon;
+
 	// Use this for initialization
 	void Start () {
-		Dungeon dungeon;
+		if (dungeon == null) {
+			GenerateDungeon ();
+		}
+	}
+
+	public IEnumerator ResetDungeon(){
+		ClearDungeon ();
+		yield return new WaitForSeconds (1f);
+		GenerateDungeon ();
+	}
+
+	public void ResetDungeonVoid(bool editorMode = false){
+		ClearDungeon (editorMode);
+		GenerateDungeon ();
+	}
+
+	public void AddDifficulty(float addDifficulty){
+		difficulty += addDifficulty;
+		if (difficulty > 1)
+			difficulty = 1;
+		if (difficulty < 0)
+			difficulty = 0;
+	}
+
+	public void ClearDungeon(bool editorMode = false){
+		for (int i = transform.childCount - 1; i >= 0; i--) {
+			DestroyCustom (transform.GetChild (i).gameObject, editorMode);
+		}
+		for (int i = canvas.transform.childCount - 1; i >= 0; i--) {
+			DestroyCustom (canvas.transform.GetChild (i).gameObject, editorMode);
+		}
+		DestroyCustom (Camera.main.GetComponent<MainCameraController> (), editorMode);
+		dungeon = null;
+	}
+
+	void DestroyCustom(Object obj,bool editorMode = false){
+		if (editorMode) {
+			DestroyImmediate (obj);
+		} else {
+			Destroy (obj);
+		}
+	}
+
+	public void GenerateDungeon () {
 		do {
 			dungeon = new Dungeon ((uint)height, (uint)width);
 		} while(dungeon.corridors.Count > difficulty * 30f || dungeon.corridors.Count < 2
@@ -85,7 +130,7 @@ public class GenerateLevel : MonoBehaviour {
     }
 
 	void InstantiateTile(GameObject prefab, uint size, Vector3 position, Quaternion rotation){
-		GameObject tile = Instantiate (prefab, size * position, rotation);
+		GameObject tile = Instantiate (prefab, size * position, rotation, transform);
 		tile.transform.localScale = new Vector3 (
 			(tile.transform.localScale.x * size) / base_size,
 			(tile.transform.localScale.y * size) / base_size,
@@ -101,18 +146,17 @@ public class GenerateLevel : MonoBehaviour {
 				break;
 			
 			// Generate random values
-			//int randomState = Random.Range (0, 10);
-			int randomState = 0;
+			int randomState = Random.Range (0, 10);
+			//int randomState = 0;
 			if (randomState > 2)
 				randomState = 0;
 			StartingState state = (StartingState)randomState;
 			float idle = Random.value * Random.Range (1, 5) + 1f;
-			Characteristics chara = Characteristics.random ();
+			Characteristics chara = Characteristics.random (difficulty);
 			Corridor corridor = corridorPicker.Pick ();
-			Debug.Log (corridor.start + ";" + corridor.length + ";" + corridor.dir);
 
 			// Instantiate guard
-			GameObject guard = Instantiate (guardPrefab, tile_size * new Vector3 (corridor.start.x, corridor.start.y, 0), Quaternion.identity);
+			GameObject guard = Instantiate (guardPrefab, tile_size * new Vector3 (corridor.start.x, corridor.start.y, 0), Quaternion.identity, transform);
 
 			// Edit guardController values
 			GuardController guardController = guard.GetComponent<GuardController> ();
@@ -139,7 +183,12 @@ public class GenerateLevel : MonoBehaviour {
 		Vector2 start = size * new Vector2 (startCorridor.start.x, startCorridor.start.y);
 		Vector2 next = start;
 		guard.waypoints.Add (new Waypoint (next));
-		Vector2Int nextPos = startCorridor.Forward (startCorridor.start, (int)(startCorridor.length - 1));
+		Vector2Int nextPos = startCorridor.start;
+		int dist = 0;
+		while (dungeon.floor [nextPos.x, nextPos.y] == 1) {
+			nextPos = startCorridor.Forward (startCorridor.start, ++dist);
+		}
+		nextPos = startCorridor.Forward (startCorridor.start, dist - 1);
 		//Corridor nextCorridor = dungeon.GetCorridorFromCoord (nextPos);
 		//if (nextCorridor != null) {
 		next = size * new Vector2 (nextPos.x, nextPos.y);
@@ -158,17 +207,22 @@ public class GenerateLevel : MonoBehaviour {
 	}
 
 	void SpawnPlayer(Vector2 position){
-		GameObject player = Instantiate (playerPrefab, tile_size * position, Quaternion.identity);
+		GameObject player = Instantiate (playerPrefab, tile_size * position, Quaternion.identity, transform);
+
 		GameObject mainCamera = Camera.main.gameObject;
 		mainCamera.AddComponent<MainCameraController> ();
 		mainCamera.GetComponent<MainCameraController> ().target = player;
+		mainCamera.GetComponent<MainCameraController> ().Setup ();
+
 		GameObject staminaBar = Instantiate (staminaBarPrefab, canvas.transform);
 		player.GetComponent<PlayerController> ().staminaBar = staminaBar.GetComponent<RectTransform> ();
 		player.GetComponent<PlayerController> ().staminaDrain = difficulty * 20f;
 	}
 
 	void SpawnEnd(Vector2 position){
-		GameObject end = Instantiate (endPrefab, tile_size * position, Quaternion.identity);
+		GameObject end = Instantiate (endPrefab, tile_size * position, Quaternion.identity, transform);
+		GameObject endText = Instantiate (endTextPrefab, canvas.transform);
+		endText.SetActive (false);
 		end.GetComponent<Finish> ().endText = endText;
 	}
 

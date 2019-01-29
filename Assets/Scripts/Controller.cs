@@ -19,14 +19,13 @@ public class Controller : MonoBehaviour{
 
 	// Change the controller's attributes
 	public void ChangeController(ControllerState other){
-		innerState.characteristics = other.characteristics;
+		//innerState.characteristics = other.characteristics;
 		innerState.type = other.type;
 		innerState.spriteManager = other.spriteManager;
 	}
 
 	// Update the sprite of the controller
 	public void UpdateController(){
-		GetComponent<SpriteRenderer> ().sprite = innerState.spriteManager.sprite;
 		GetComponent<SpriteRenderer> ().color = innerState.spriteManager.color;
 		transform.localScale = innerState.spriteManager.scale;
 		GetComponent<Animator> ().runtimeAnimatorController = innerState.spriteManager.anim;
@@ -34,7 +33,6 @@ public class Controller : MonoBehaviour{
 
 	// Save the sprite state
 	public void SaveCurrentState(){
-		innerState.spriteManager.sprite = GetComponent<SpriteRenderer> ().sprite;
 		innerState.spriteManager.color = GetComponent<SpriteRenderer> ().color;
 		innerState.spriteManager.scale = transform.localScale;
 		innerState.spriteManager.anim = GetComponent<Animator> ().runtimeAnimatorController;

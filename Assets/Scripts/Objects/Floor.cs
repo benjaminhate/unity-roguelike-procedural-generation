@@ -168,8 +168,8 @@ public class Floor
         }
 
         // Doors' creation
-        bool[] door_created_labels = new bool[label - 3]; // Every element is set to false by default
-        uint[] visited_surfaces = new uint[label - 3];
+        bool[] door_created_labels = new bool[label - 3 + 1]; // Every element is set to false by default
+        uint[] visited_surfaces = new uint[label - 3 + 1];
         float proba = 1.3F;
         for (int i = 1; i < width - 1; i++)
         {

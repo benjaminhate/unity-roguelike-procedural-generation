@@ -27,13 +27,6 @@ public class Dungeon
         Floor f = new Floor(height, width);
         this.floor = f.GetFloor();
 
-		for (uint i = 0; i < width; i++) {
-			for (uint j = 0; j < height; j++) {
-				if (floor [i, j] == 1)
-					Debug.Log ("Floor [" + i + "," + j + "] : " + floor [i, j]);
-			}
-		}
-
         /* Corridors */
 		AddCorridors (floor);
 

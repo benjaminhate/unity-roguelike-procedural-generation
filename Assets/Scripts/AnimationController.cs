@@ -40,6 +40,9 @@ public class AnimationController : MonoBehaviour {
 
 	public void UpdateAnimator()
 	{
+		if (anim == null)
+			return;
+		
 		float angle = rotController.rotation.eulerAngles.z;
 		float speed = animSpeed;
 

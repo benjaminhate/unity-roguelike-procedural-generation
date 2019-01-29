@@ -14,10 +14,10 @@ public class Characteristics {
 		this.absorbForce = absorbForce;
 	}
 
-	public static Characteristics random(){
+	public static Characteristics random(float difficulty){
 		return new Characteristics (
-			Random.value * Random.Range (1, 10) + 2f,
-			Random.value * Random.Range (1, 5) + 1f,
-			Random.value * Random.Range (1, 5) + 1f);
+			Random.value * Random.Range (1, 10) * difficulty + 2f,
+			Random.value * Random.Range (1, 5) * difficulty + 1f,
+			Random.value * Random.Range (1, 5) * difficulty + 1f);
 	}
 }

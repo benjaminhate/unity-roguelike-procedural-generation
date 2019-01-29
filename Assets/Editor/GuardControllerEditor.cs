@@ -23,12 +23,15 @@ public class GuardControllerEditor : Editor {
 	// Draw the waypoins and their number
 	void OnSceneGUI(){
 		GuardController gc = (GuardController)target;
-		Handles.color = Color.cyan;
 		int label = 0;
+		Handles.color = Color.cyan;
+		GUIStyle style = new GUIStyle ();
+		style.fontSize = 15;
+		style.normal.textColor = Color.black;
 		if (gc.startingState == StartingState.Patrol) {
 			foreach (Waypoint w in gc.waypoints) {
 				Handles.DrawWireArc (w.position, Vector3.forward, Vector3.right, 360, .25f);
-				Handles.Label (w.position, (label++).ToString());
+				Handles.Label (w.position, (label++).ToString(), style);
 			}
 		}
 	}

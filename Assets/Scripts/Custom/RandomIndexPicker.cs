@@ -17,8 +17,8 @@ public class RandomIndexPicker <T> {
 
 	public int PickIndex(bool remove = true){
 		int index = indexes [Random.Range (0, indexes.Count)];
-		Debug.Log (index);
-		Print ();
+		//Debug.Log (index);
+		//Print ();
 		if (remove)
 			RemoveAt (index);
 		return index;
