@@ -19,8 +19,17 @@ public class Room {
         return true;
     }
 
-	public Vector2 GetCenter(){
-		return GetCentroid ();
+	public Vector2 GetCenter() {
+		if (this.corners.Count == 4)
+            return GetCentroid();
+        Vector2 pos = (Vector2) (this.corners[0] + this.corners[1]) / 2.0f;
+        for (int i = 1; i < this.corners.Count; ++i)
+        {
+            Vector2 new_pos = (Vector2) (this.corners[i] + this.corners[(i + 1) % this.corners.Count]) / 2.0f;
+            if (Vector2.Distance(pos, this.door) < Vector2.Distance(new_pos, this.door))
+                pos = new_pos;
+        }
+        return pos;
 	}
 
 	public Vector2 GetCentroid()
