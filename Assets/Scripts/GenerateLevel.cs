@@ -25,7 +25,7 @@ public class GenerateLevel : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		if (dungeon == null) {
+		if (dungeon == null && transform.childCount == 0) {
 			GenerateDungeon ();
 		}
 	}
